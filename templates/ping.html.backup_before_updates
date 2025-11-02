@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Monitor - Ultimate Network Tool</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* ===== HAMBURGER MENU (CSS ONLY - from homepage) ===== */
+        .menu-toggle {
+            display: none;
+        }
+
+        .hamburger {
+            position: absolute;
+            left: 32px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .hamburger:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.25) 100%);
+            border-color: rgba(59, 130, 246, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .hamburger span {
+            display: block;
+            width: 28px;
+            height: 3px;
+            background: #60a5fa;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* Sidebar menu */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100vh;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            padding: 90px 0 20px 0;
+            overflow-y: auto;
+        }
+
+        .menu-toggle:checked ~ .sidebar {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 20px 24px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .menu-section {
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .menu-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 24px 12px 24px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            border-left-color: #60a5fa;
+        }
+
+        .menu-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border-left-color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .menu-item svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+        }
+
+        .menu-item-text {
+            font-size: 14px;
+        }
+
+        /* Overlay when menu is open */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .menu-toggle:checked ~ .menu-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            stroke-width: 1.5;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .brand-icon:hover {
+            transform: scale(1.1) rotate(15deg);
+            filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.6));
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        h1:hover {
+            filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.4));
+        }
+
+        .tagline {
+            font-size: 12px;
+            font-weight: 400;
+            color: #94a3b8;
+            letter-spacing: 0.3px;
+        }
+
+        .admin-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            position: absolute;
+            right: 32px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-dot.admin {
+            background: #10b981;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+        }
+
+        .status-dot.not-admin {
+            background: #ef4444;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.9); }
+        }
+
+        .status-text {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #cbd5e1;
+        }
+
+        /* ===== NOTIFICATION ===== */
+        .notification {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(139, 92, 246, 0.9) 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            font-size: 14px;
+            font-weight: 600;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.95) 0%, rgba(220, 38, 38, 0.9) 100%);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(5, 150, 105, 0.9) 100%);
+        }
+
+        /* ===== INPUT SECTION ===== */
+        .input-section {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #f1f5f9;
+            font-size: 13px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:hover {
+            border-color: #3b82f6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        select, input[type="number"] {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #f1f5f9;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:hover, input[type="number"]:hover {
+            border-color: #3b82f6;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        /* ===== INFO ICON (from homepage) ===== */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 900;
+            color: white;
+            cursor: help;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .info-icon:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.1);
+        }
+
+        .info-icon::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 0;
+            bottom: calc(100% + 12px);
+            transform: scale(0.8);
+            background: rgba(15, 23, 42, 0.98);
+            color: #f1f5f9;
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            min-width: 400px;
+            max-width: 600px;
+            width: max-content;
+            white-space: normal;
+            line-height: 1.6;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .info-icon:hover::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .info-icon::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            bottom: calc(100% + 4px);
+            border: 8px solid transparent;
+            border-top-color: rgba(15, 23, 42, 0.98);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .info-icon:hover::before {
+            opacity: 1;
+        }
+
+        /* ===== ADVANCED OPTIONS (Collapsible) ===== */
+        .advanced-toggle {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .advanced-toggle:hover {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .advanced-toggle-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #60a5fa;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .advanced-toggle-icon {
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .advanced-toggle.open .advanced-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .advanced-options {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .advanced-options.open {
+            max-height: 300px;
+            margin-bottom: 16px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(239, 68, 68, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: #60a5fa;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.25) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ===== STATISTICS ===== */
+        .stats-section {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== VIEW SWITCHER ===== */
+        .view-switcher {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .view-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .view-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        /* ===== RESULTS TABLE ===== */
+        .results-section {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .results-table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: rgba(15, 23, 42, 0.6);
+            border-bottom: 2px solid rgba(148, 163, 184, 0.2);
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 11px;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.3s ease;
+        }
+
+        th:hover {
+            color: #60a5fa;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        tbody tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        td {
+            padding: 14px 16px;
+            color: #cbd5e1;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .status-reachable {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-unreachable {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-testing {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* ===== HOST DETAIL MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            max-width: 1200px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-close {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .modal-stat {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .modal-stat-label {
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 4px;
+        }
+
+        .modal-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+
+        .ping-history {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .ping-item {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .ping-item:hover {
+            background: rgba(59, 130, 246, 0.05);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .ping-item-time {
+            font-size: 12px;
+            color: #94a3b8;
+            font-family: 'Consolas', monospace;
+        }
+
+        .ping-item-result {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .ping-item-rtt {
+            font-size: 14px;
+            font-weight: 600;
+            color: #10b981;
+        }
+
+        .ping-item-rtt.failed {
+            color: #ef4444;
+        }
+
+        /* ===== TIMELINE VIEW ===== */
+        .timeline-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 1px;
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            min-width: 800px;
+        }
+
+        .timeline-host-label {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            border-right: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .timeline-row {
+            background: rgba(15, 23, 42, 0.6);
+            display: flex;
+            min-height: 40px;
+        }
+
+        .timeline-cell {
+            flex: 1;
+            min-width: 30px;
+            border-right: 1px solid rgba(148, 163, 184, 0.05);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .timeline-cell:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .timeline-cell.success {
+            background: rgba(16, 185, 129, 0.5);
+        }
+
+        .timeline-cell.failed {
+            background: rgba(239, 68, 68, 0.5);
+        }
+
+        .timeline-cell.no-data {
+            background: rgba(148, 163, 184, 0.1);
+        }
+
+        .timeline-cell.outage {
+            box-shadow: inset 0 0 0 2px #f59e0b;
+        }
+
+        .timeline-header {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            margin-bottom: 8px;
+        }
+
+        .timeline-time-labels {
+            display: flex;
+            padding-left: 150px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .timeline-time-label {
+            flex: 1;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* ===== HEATMAP VIEW ===== */
+        .heatmap-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            gap: 2px;
+            min-width: 800px;
+        }
+
+        .heatmap-row {
+            display: grid;
+            grid-template-columns: 150px repeat(auto-fit, minmax(40px, 1fr));
+            gap: 2px;
+        }
+
+        .heatmap-host-label {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+        }
+
+        .heatmap-cell {
+            min-width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .heatmap-cell:hover {
+            transform: scale(1.15);
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .heatmap-cell.rate-100 { background: rgba(16, 185, 129, 0.9); color: white; }
+        .heatmap-cell.rate-75 { background: rgba(16, 185, 129, 0.6); color: white; }
+        .heatmap-cell.rate-50 { background: rgba(251, 191, 36, 0.6); color: white; }
+        .heatmap-cell.rate-25 { background: rgba(239, 68, 68, 0.6); color: white; }
+        .heatmap-cell.rate-0 { background: rgba(239, 68, 68, 0.9); color: white; }
+        .heatmap-cell.no-data { background: rgba(148, 163, 184, 0.2); }
+
+        .heatmap-legend {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 8px;
+            font-size: 11px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #64748b;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu Checkbox -->
+    <input type="checkbox" id="menuToggle" class="menu-toggle">
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Network Tools</div>
+            <div class="sidebar-subtitle">Select a tool to use</div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Main Tools</div>
+            <a href="/" class="menu-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="menu-item-text">Home</span>
+            </a>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Discovery Tools</div>
+            <a href="/#discovery" class="menu-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <span class="menu-item-text">Switch Discovery</span>
+            </a>
+            <a href="/#vlan" class="menu-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+                <span class="menu-item-text">VLAN Detection</span>
+            </a>
+            <a href="/ping" class="menu-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <circle cx="12" cy="12" r="9"></circle>
+                </svg>
+                <span class="menu-item-text">Ping Monitor</span>
+            </a>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Coming Soon</div>
+            <a href="#" class="menu-item" style="opacity: 0.5; pointer-events: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span class="menu-item-text">More Tools Coming...</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Overlay for closing menu -->
+    <label for="menuToggle" class="menu-overlay"></label>
+
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <label for="menuToggle" class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+
+            <div class="title-section">
+                <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" onclick="window.location.href='/'">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="6"/>
+                    <circle cx="12" cy="12" r="2"/>
+                    <line x1="12" y1="2" x2="12" y2="6"/>
+                    <line x1="12" y1="18" x2="12" y2="22"/>
+                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/>
+                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+                    <line x1="2" y1="12" x2="6" y2="12"/>
+                    <line x1="18" y1="12" x2="22" y2="12"/>
+                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/>
+                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+                </svg>
+                <div class="brand-text">
+                    <h1 onclick="window.location.href='/'">ULTIMATE NETWORK TOOL</h1>
+                    <span class="tagline">Ping Monitor</span>
+                </div>
+            </div>
+
+            <div class="admin-status">
+                <div class="status-dot not-admin" id="statusDot"></div>
+                <span class="status-text" id="statusText">Checking...</span>
+            </div>
+        </div>
+
+        <!-- NOTIFICATION -->
+        <div class="notification" id="notification"></div>
+
+        <!-- INPUT SECTION -->
+        <div class="input-section">
+            <div class="section-title">Target Hosts</div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>IP Addresses / Hostnames (One per line)</label>
+                    <textarea id="ipInput" placeholder="192.168.1.1&#10;192.168.1.10-192.168.1.20&#10;192.168.2.0/24&#10;google.com&#10;8.8.8.8"></textarea>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 8px;">
+                        Supports: Single IPs, Ranges (192.168.1.1-192.168.1.100), CIDR (192.168.1.0/24), Hostnames
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Controls -->
+            <div class="controls-grid">
+                <div class="control-item">
+                    <label>
+                        Monitoring Mode
+                        <div class="info-icon" data-tooltip="CONTINUOUS: Pings hosts repeatedly every [Interval] seconds until you click Stop. ROUNDS: Performs a specific number of ping rounds (e.g., 10 rounds = 10 separate ping tests to each host), then automatically stops.">ℹ</div>
+                    </label>
+                    <select id="monitoringMode" onchange="toggleMonitoringMode()">
+                        <option value="continuous" selected>Continuous</option>
+                        <option value="rounds">Limited Rounds</option>
+                    </select>
+                </div>
+
+                <div class="control-item" id="roundsControl" style="display: none;">
+                    <label>
+                        Number of Rounds
+                        <div class="info-icon" data-tooltip="How many times to ping all hosts. For example: 10 rounds means each host will be tested 10 separate times with the interval delay between each round.">ℹ</div>
+                    </label>
+                    <input type="number" id="rounds" value="10" min="1" max="100">
+                </div>
+
+                <div class="control-item">
+                    <label>
+                        Interval Between Rounds
+                        <div class="info-icon" data-tooltip="Wait time between ping rounds. Default: 1 second. This prevents network flooding and gives a realistic monitoring view over time.">ℹ</div>
+                    </label>
+                    <select id="interval">
+                        <option value="1" selected>1 second</option>
+                        <option value="5">5 seconds</option>
+                        <option value="10">10 seconds</option>
+                        <option value="30">30 seconds</option>
+                        <option value="60">60 seconds</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Advanced Options -->
+            <div class="advanced-toggle" onclick="toggleAdvancedOptions()">
+                <span class="advanced-toggle-text">⚙ Advanced Options</span>
+                <span class="advanced-toggle-icon">▼</span>
+            </div>
+
+            <div class="advanced-options" id="advancedOptions">
+                <div class="controls-grid">
+                    <div class="control-item">
+                        <label>
+                            Ping Count (per host)
+                            <div class="info-icon" data-tooltip="Number of ICMP ping packets sent to each host in ONE round. Default: 4 pings per host. Used to calculate average/min/max response time and packet loss percentage. Higher values = more accurate statistics but slower testing.">ℹ</div>
+                        </label>
+                        <select id="pingCount">
+                            <option value="1">1 ping</option>
+                            <option value="4" selected>4 pings</option>
+                            <option value="10">10 pings</option>
+                            <option value="20">20 pings</option>
+                        </select>
+                    </div>
+
+                    <div class="control-item">
+                        <label>
+                            Timeout (seconds)
+                            <div class="info-icon" data-tooltip="How long to wait for a ping response before considering it failed. Default: 2 seconds. Increase for slow/high-latency networks (e.g., satellite, international links). Decrease for fast local networks to speed up detection.">ℹ</div>
+                        </label>
+                        <select id="timeout">
+                            <option value="1">1 second</option>
+                            <option value="2" selected>2 seconds</option>
+                            <option value="5">5 seconds</option>
+                            <option value="10">10 seconds</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" id="startBtn" onclick="startPing()">
+                    ▶ Start Ping
+                </button>
+                <button class="btn btn-danger" id="stopBtn" onclick="stopPing()" style="display: none;">
+                    ■ Stop
+                </button>
+                <button class="btn btn-secondary" onclick="clearResults()">
+                    Clear Results
+                </button>
+                <button class="btn btn-secondary" onclick="exportCSV()">
+                    ⬇ Export CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- STATISTICS -->
+        <div class="stats-section" id="statsSection" style="display: none;">
+            <div class="section-title">Statistics</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Hosts</div>
+                    <div class="stat-value" id="statTotal">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Reachable</div>
+                    <div class="stat-value" style="color: #10b981;" id="statReachable">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Unreachable</div>
+                    <div class="stat-value" style="color: #ef4444;" id="statUnreachable">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-value" id="statPercent">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Response</div>
+                    <div class="stat-value" id="statAvgPing">0ms</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTS SECTION -->
+        <div class="results-section">
+            <div class="results-header">
+                <div class="section-title" style="margin-bottom: 0;">Results</div>
+
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                    <!-- View Switcher -->
+                    <div class="view-switcher">
+                        <button class="view-btn active" onclick="switchView('table')">📋 Table</button>
+                        <button class="view-btn" onclick="switchView('timeline')">📊 Timeline</button>
+                        <button class="view-btn" onclick="switchView('heatmap')">🔥 Heatmap</button>
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterResults('all')">Show All</button>
+                        <button class="filter-btn" onclick="filterResults('reachable')">Reachable Only</button>
+                        <button class="filter-btn" onclick="filterResults('unreachable')">Unreachable Only</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE VIEW -->
+            <div id="tableView" class="results-table-container">
+                <table id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('ip')">IP Address ▼</th>
+                            <th onclick="sortTable('hostname')">Hostname ▼</th>
+                            <th onclick="sortTable('status')">Status ▼</th>
+                            <th onclick="sortTable('ping')">Avg Ping (ms) ▼</th>
+                            <th onclick="sortTable('packets')">Packets (Sent/Rcv) ▼</th>
+                            <th onclick="sortTable('loss')">Loss % ▼</th>
+                            <th onclick="sortTable('ttl')">TTL ▼</th>
+                            <th onclick="sortTable('lastUpdate')">Last Update ▼</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                        <tr>
+                            <td colspan="8">
+                                <div class="empty-state">
+                                    Enter IP addresses or ranges above and click "Start Ping" to begin monitoring
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- TIMELINE VIEW -->
+            <div id="timelineView" class="timeline-container" style="display: none;">
+                <div class="timeline-time-labels" id="timelineLabels"></div>
+                <div class="timeline-grid" id="timelineGrid"></div>
+            </div>
+
+            <!-- HEATMAP VIEW -->
+            <div id="heatmapView" class="heatmap-container" style="display: none;">
+                <div class="heatmap-grid" id="heatmapGrid"></div>
+                <div class="heatmap-legend">
+                    <div class="legend-item">
+                        <div class="legend-color rate-100"></div>
+                        <span>100% Success</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color rate-75"></div>
+                        <span>75-99%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color rate-50"></div>
+                        <span>50-74%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color rate-25"></div>
+                        <span>25-49%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color rate-0"></div>
+                        <span>0-24%</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color no-data"></div>
+                        <span>No Data</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOST DETAIL MODAL -->
+        <div class="modal-overlay" id="hostModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title" id="modalHostTitle">Host Details</div>
+                    <button class="modal-close" onclick="closeHostDetail()">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-stats" id="modalStats"></div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div class="section-title" style="margin-bottom: 0;">Ping History</div>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" onclick="filterHostPings('all')">All</button>
+                            <button class="filter-btn" onclick="filterHostPings('success')">Success Only</button>
+                            <button class="filter-btn" onclick="filterHostPings('failed')">Failed Only</button>
+                        </div>
+                    </div>
+
+                    <div class="ping-history" id="pingHistory"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            © Digidots 2025
+        </div>
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <script>
+        // Global state
+        let socket = null;
+        let results = new Map();
+        let pingHistory = new Map(); // Store all individual pings per host
+        let currentFilter = 'all';
+        let currentView = 'table';
+        let sortColumn = 'ip';
+        let sortAscending = true;
+        let isMonitoring = false;
+        let currentRound = 0;
+        let maxRounds = 0;
+        let selectedHost = null;
+        let hostPingFilter = 'all';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            connectWebSocket();
+            checkStatus();
+        });
+
+        // Toggle advanced options
+        function toggleAdvancedOptions() {
+            const toggle = document.querySelector('.advanced-toggle');
+            const options = document.getElementById('advancedOptions');
+            toggle.classList.toggle('open');
+            options.classList.toggle('open');
+        }
+
+        // Toggle monitoring mode
+        function toggleMonitoringMode() {
+            const mode = document.getElementById('monitoringMode').value;
+            const roundsControl = document.getElementById('roundsControl');
+
+            if (mode === 'rounds') {
+                roundsControl.style.display = 'flex';
+            } else {
+                roundsControl.style.display = 'none';
+            }
+        }
+
+        // WebSocket Connection
+        function connectWebSocket() {
+            socket = io();
+
+            socket.on('connect', () => {
+                console.log('WebSocket connected');
+            });
+
+            socket.on('disconnect', () => {
+                console.log('WebSocket disconnected');
+                showNotification('Disconnected from server', 'error');
+            });
+
+            socket.on('ping_result', (data) => {
+                updateResult(data);
+            });
+
+            socket.on('ping_started', (data) => {
+                showNotification(`Monitoring ${data.total} hosts`, 'info');
+            });
+
+            socket.on('ping_complete', () => {
+                currentRound++;
+
+                const mode = document.getElementById('monitoringMode').value;
+                if (mode === 'rounds' && currentRound >= maxRounds) {
+                    isMonitoring = false;
+                    updateButtons();
+                    showNotification(`Completed ${maxRounds} rounds`, 'success');
+                } else if (mode === 'continuous') {
+                    // Keep monitoring
+                } else {
+                    isMonitoring = false;
+                    updateButtons();
+                    showNotification('Ping complete', 'success');
+                }
+            });
+
+            socket.on('ping_stopped', () => {
+                isMonitoring = false;
+                updateButtons();
+                showNotification('Monitoring stopped', 'info');
+            });
+
+            socket.on('error', (data) => {
+                showNotification(data.message, 'error');
+            });
+        }
+
+        // Check admin status
+        async function checkStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+
+                const statusDot = document.getElementById('statusDot');
+                const statusText = document.getElementById('statusText');
+
+                if (data.is_admin) {
+                    statusDot.classList.remove('not-admin');
+                    statusDot.classList.add('admin');
+                    statusText.textContent = 'ADMINISTRATOR';
+                } else {
+                    statusDot.classList.remove('admin');
+                    statusDot.classList.add('not-admin');
+                    statusText.textContent = 'NOT ADMIN';
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+                document.getElementById('statusText').textContent = 'ERROR';
+            }
+        }
+
+        // Start ping
+        function startPing() {
+            const input = document.getElementById('ipInput').value.trim();
+            if (!input) {
+                showNotification('Please enter at least one IP address', 'error');
+                return;
+            }
+
+            const pingCount = parseInt(document.getElementById('pingCount').value);
+            const timeout = parseInt(document.getElementById('timeout').value);
+            const interval = parseInt(document.getElementById('interval').value);
+            const mode = document.getElementById('monitoringMode').value;
+            const rounds = mode === 'rounds' ? parseInt(document.getElementById('rounds').value) : 0;
+
+            const continuous = (mode === 'continuous');
+
+            currentRound = 0;
+            maxRounds = rounds;
+
+            socket.emit('start_ping', {
+                input: input,
+                ping_count: pingCount,
+                timeout: timeout,
+                continuous: continuous,
+                interval: interval
+            });
+
+            isMonitoring = true;
+            updateButtons();
+            document.getElementById('statsSection').style.display = 'block';
+        }
+
+        // Stop ping
+        function stopPing() {
+            socket.emit('stop_ping');
+        }
+
+        // Update buttons
+        function updateButtons() {
+            document.getElementById('startBtn').style.display = isMonitoring ? 'none' : 'inline-flex';
+            document.getElementById('stopBtn').style.display = isMonitoring ? 'inline-flex' : 'none';
+        }
+
+        // Update result
+        function updateResult(data) {
+            results.set(data.ip, data);
+
+            // Store ping history
+            if (!pingHistory.has(data.ip)) {
+                pingHistory.set(data.ip, []);
+            }
+
+            // Add this ping to history
+            pingHistory.get(data.ip).push({
+                timestamp: new Date(data.last_update),
+                status: data.status,
+                rtt: data.avg_ping_ms,
+                packets_sent: data.packets_sent,
+                packets_received: data.packets_received,
+                packet_loss: data.packet_loss_percent,
+                ttl: data.ttl
+            });
+
+            // Keep only last 100 pings per host
+            if (pingHistory.get(data.ip).length > 100) {
+                pingHistory.get(data.ip).shift();
+            }
+
+            renderCurrentView();
+            updateStatistics();
+        }
+
+        // Switch view
+        function switchView(view) {
+            currentView = view;
+
+            // Update view buttons
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Hide all views
+            document.getElementById('tableView').style.display = 'none';
+            document.getElementById('timelineView').style.display = 'none';
+            document.getElementById('heatmapView').style.display = 'none';
+
+            // Show selected view
+            if (view === 'table') {
+                document.getElementById('tableView').style.display = 'block';
+            } else if (view === 'timeline') {
+                document.getElementById('timelineView').style.display = 'block';
+            } else if (view === 'heatmap') {
+                document.getElementById('heatmapView').style.display = 'block';
+            }
+
+            renderCurrentView();
+        }
+
+        // Render current view
+        function renderCurrentView() {
+            if (currentView === 'table') {
+                renderTableView();
+            } else if (currentView === 'timeline') {
+                renderTimelineView();
+            } else if (currentView === 'heatmap') {
+                renderHeatmapView();
+            }
+        }
+
+        // Render table view
+        function renderTableView() {
+            const tbody = document.getElementById('resultsBody');
+
+            if (results.size === 0) {
+                tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state">No results yet</div></td></tr>';
+                return;
+            }
+
+            let resultArray = Array.from(results.values());
+
+            if (currentFilter === 'reachable') {
+                resultArray = resultArray.filter(r => r.status === 'Reachable');
+            } else if (currentFilter === 'unreachable') {
+                resultArray = resultArray.filter(r => r.status === 'Unreachable');
+            }
+
+            resultArray.sort((a, b) => {
+                let aVal = a[sortColumn] || '';
+                let bVal = b[sortColumn] || '';
+
+                if (sortColumn === 'ping') {
+                    aVal = a.avg_ping_ms || 9999;
+                    bVal = b.avg_ping_ms || 9999;
+                } else if (sortColumn === 'loss') {
+                    aVal = a.packet_loss_percent || 0;
+                    bVal = b.packet_loss_percent || 0;
+                }
+
+                if (sortAscending) {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            tbody.innerHTML = resultArray.map(r => {
+                const statusClass = r.status === 'Reachable' ? 'status-reachable' :
+                                   r.status === 'Unreachable' ? 'status-unreachable' : 'status-testing';
+
+                const avgPing = r.avg_ping_ms !== null ? r.avg_ping_ms.toFixed(1) : 'N/A';
+                const lastUpdate = new Date(r.last_update).toLocaleTimeString();
+
+                return `
+                    <tr onclick="showHostDetail('${r.ip}')">
+                        <td>${r.ip}</td>
+                        <td>${r.hostname || 'N/A'}</td>
+                        <td><span class="status-badge ${statusClass}">${r.status}</span></td>
+                        <td>${avgPing}</td>
+                        <td>${r.packets_sent}/${r.packets_received}</td>
+                        <td>${r.packet_loss_percent.toFixed(0)}%</td>
+                        <td>${r.ttl || 'N/A'}</td>
+                        <td>${lastUpdate}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Render timeline view
+        function renderTimelineView() {
+            const grid = document.getElementById('timelineGrid');
+            const labels = document.getElementById('timelineLabels');
+
+            if (results.size === 0) {
+                grid.innerHTML = '<div class="empty-state">No results yet</div>';
+                labels.innerHTML = '';
+                return;
+            }
+
+            let resultArray = Array.from(results.values());
+            if (currentFilter === 'reachable') {
+                resultArray = resultArray.filter(r => r.status === 'Reachable');
+            } else if (currentFilter === 'unreachable') {
+                resultArray = resultArray.filter(r => r.status === 'Unreachable');
+            }
+
+            // Generate time labels (last 30 pings)
+            const maxPings = 30;
+            labels.innerHTML = '';
+            for (let i = 0; i < maxPings; i++) {
+                const label = document.createElement('div');
+                label.className = 'timeline-time-label';
+                label.textContent = i === 0 ? 'Now' : `-${i}`;
+                labels.appendChild(label);
+            }
+
+            // Render timeline for each host
+            grid.innerHTML = '';
+            resultArray.forEach(host => {
+                const history = pingHistory.get(host.ip) || [];
+                const recentPings = history.slice(-maxPings);
+
+                // Host label
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'timeline-host-label';
+                labelDiv.textContent = host.ip;
+                grid.appendChild(labelDiv);
+
+                // Timeline row
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'timeline-row';
+
+                // Pad with empty cells if needed
+                const padding = maxPings - recentPings.length;
+                for (let i = 0; i < padding; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'timeline-cell no-data';
+                    rowDiv.appendChild(cell);
+                }
+
+                // Add ping cells
+                recentPings.forEach((ping, idx) => {
+                    const cell = document.createElement('div');
+                    cell.className = `timeline-cell ${ping.status === 'Reachable' ? 'success' : 'failed'}`;
+                    cell.title = `${ping.timestamp.toLocaleTimeString()} - ${ping.status} - ${ping.rtt ? ping.rtt.toFixed(1) + 'ms' : 'N/A'}`;
+                    cell.onclick = () => showHostDetail(host.ip);
+                    rowDiv.appendChild(cell);
+                });
+
+                grid.appendChild(rowDiv);
+            });
+
+            // Detect outages (multiple hosts failing at same time)
+            detectOutages();
+        }
+
+        // Detect outages
+        function detectOutages() {
+            // Find time slots where 50%+ of hosts that were previously reachable are now failing
+            // This is a simplified implementation - can be enhanced
+        }
+
+        // Render heatmap view
+        function renderHeatmapView() {
+            const grid = document.getElementById('heatmapGrid');
+
+            if (results.size === 0) {
+                grid.innerHTML = '<div class="empty-state">No results yet</div>';
+                return;
+            }
+
+            let resultArray = Array.from(results.values());
+            if (currentFilter === 'reachable') {
+                resultArray = resultArray.filter(r => r.status === 'Reachable');
+            } else if (currentFilter === 'unreachable') {
+                resultArray = resultArray.filter(r => r.status === 'Unreachable');
+            }
+
+            grid.innerHTML = '';
+
+            resultArray.forEach(host => {
+                const history = pingHistory.get(host.ip) || [];
+
+                // Group pings into 10-second buckets
+                const buckets = groupPingsIntoBuckets(history, 10);
+
+                const row = document.createElement('div');
+                row.className = 'heatmap-row';
+
+                // Host label
+                const label = document.createElement('div');
+                label.className = 'heatmap-host-label';
+                label.textContent = host.ip;
+                row.appendChild(label);
+
+                // Heatmap cells
+                buckets.forEach((bucket, idx) => {
+                    const cell = document.createElement('div');
+                    cell.className = 'heatmap-cell';
+
+                    if (bucket.count === 0) {
+                        cell.classList.add('no-data');
+                    } else {
+                        const successRate = (bucket.success / bucket.count) * 100;
+                        if (successRate === 100) cell.classList.add('rate-100');
+                        else if (successRate >= 75) cell.classList.add('rate-75');
+                        else if (successRate >= 50) cell.classList.add('rate-50');
+                        else if (successRate >= 25) cell.classList.add('rate-25');
+                        else cell.classList.add('rate-0');
+
+                        cell.textContent = `${Math.round(successRate)}%`;
+                    }
+
+                    cell.title = `Bucket ${idx + 1}: ${bucket.success}/${bucket.count} success`;
+                    cell.onclick = () => showHostDetail(host.ip);
+                    row.appendChild(cell);
+                });
+
+                grid.appendChild(row);
+            });
+        }
+
+        // Group pings into time buckets
+        function groupPingsIntoBuckets(pings, bucketSize) {
+            if (pings.length === 0) return Array(10).fill({count: 0, success: 0});
+
+            const buckets = [];
+            const totalBuckets = 10;
+            const pingsPerBucket = Math.ceil(pings.length / totalBuckets);
+
+            for (let i = 0; i < totalBuckets; i++) {
+                const start = i * pingsPerBucket;
+                const end = start + pingsPerBucket;
+                const bucketPings = pings.slice(start, end);
+
+                buckets.push({
+                    count: bucketPings.length,
+                    success: bucketPings.filter(p => p.status === 'Reachable').length
+                });
+            }
+
+            return buckets;
+        }
+
+        // Show host detail
+        function showHostDetail(ip) {
+            selectedHost = ip;
+            const host = results.get(ip);
+            if (!host) return;
+
+            document.getElementById('modalHostTitle').textContent = `${host.hostname || ip} - Detailed View`;
+
+            // Update stats
+            const statsDiv = document.getElementById('modalStats');
+            statsDiv.innerHTML = `
+                <div class="modal-stat">
+                    <div class="modal-stat-label">IP Address</div>
+                    <div class="modal-stat-value">${host.ip}</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-label">Status</div>
+                    <div class="modal-stat-value">${host.status}</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-label">Avg Ping</div>
+                    <div class="modal-stat-value">${host.avg_ping_ms ? host.avg_ping_ms.toFixed(1) + 'ms' : 'N/A'}</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-label">Min Ping</div>
+                    <div class="modal-stat-value">${host.min_ping_ms ? host.min_ping_ms.toFixed(1) + 'ms' : 'N/A'}</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-label">Max Ping</div>
+                    <div class="modal-stat-value">${host.max_ping_ms ? host.max_ping_ms.toFixed(1) + 'ms' : 'N/A'}</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-label">Packet Loss</div>
+                    <div class="modal-stat-value">${host.packet_loss_percent.toFixed(0)}%</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-label">TTL</div>
+                    <div class="modal-stat-value">${host.ttl || 'N/A'}</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-label">Total Pings</div>
+                    <div class="modal-stat-value">${pingHistory.get(ip)?.length || 0}</div>
+                </div>
+            `;
+
+            // Reset filter
+            hostPingFilter = 'all';
+            document.querySelectorAll('.modal-body .filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.modal-body .filter-btn')[0].classList.add('active');
+
+            renderHostPingHistory();
+
+            document.getElementById('hostModal').classList.add('show');
+        }
+
+        // Filter host pings
+        function filterHostPings(filter) {
+            hostPingFilter = filter;
+
+            // Update button states
+            const buttons = document.querySelectorAll('.modal-body .filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            renderHostPingHistory();
+        }
+
+        // Render host ping history
+        function renderHostPingHistory() {
+            const history = pingHistory.get(selectedHost) || [];
+            const historyDiv = document.getElementById('pingHistory');
+
+            let filteredHistory = history;
+            if (hostPingFilter === 'success') {
+                filteredHistory = history.filter(p => p.status === 'Reachable');
+            } else if (hostPingFilter === 'failed') {
+                filteredHistory = history.filter(p => p.status !== 'Reachable');
+            }
+
+            if (filteredHistory.length === 0) {
+                historyDiv.innerHTML = '<div class="empty-state">No pings match the filter</div>';
+                return;
+            }
+
+            // Show most recent first
+            const reversed = [...filteredHistory].reverse();
+
+            historyDiv.innerHTML = reversed.map(ping => {
+                const rttClass = ping.status === 'Reachable' ? '' : 'failed';
+                const rttText = ping.status === 'Reachable' ? `${ping.rtt.toFixed(1)}ms` : 'FAILED';
+
+                return `
+                    <div class="ping-item">
+                        <div class="ping-item-time">${ping.timestamp.toLocaleTimeString()}</div>
+                        <div class="ping-item-result">
+                            <span class="status-badge ${ping.status === 'Reachable' ? 'status-reachable' : 'status-unreachable'}">${ping.status}</span>
+                            <span class="ping-item-rtt ${rttClass}">${rttText}</span>
+                            <span style="font-size: 12px; color: #94a3b8;">${ping.packets_sent}/${ping.packets_received} pkts</span>
+                            <span style="font-size: 12px; color: #94a3b8;">Loss: ${ping.packet_loss.toFixed(0)}%</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Close host detail
+        function closeHostDetail() {
+            document.getElementById('hostModal').classList.remove('show');
+            selectedHost = null;
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const total = results.size;
+            const reachable = Array.from(results.values()).filter(r => r.status === 'Reachable').length;
+            const unreachable = total - reachable;
+            const percent = total > 0 ? ((reachable / total) * 100).toFixed(1) : 0;
+
+            const reachableHosts = Array.from(results.values()).filter(r => r.status === 'Reachable' && r.avg_ping_ms !== null);
+            const avgPing = reachableHosts.length > 0
+                ? (reachableHosts.reduce((sum, r) => sum + r.avg_ping_ms, 0) / reachableHosts.length).toFixed(1)
+                : 0;
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statReachable').textContent = reachable;
+            document.getElementById('statUnreachable').textContent = unreachable;
+            document.getElementById('statPercent').textContent = `${percent}%`;
+            document.getElementById('statAvgPing').textContent = `${avgPing}ms`;
+        }
+
+        // Filter results
+        function filterResults(filter) {
+            currentFilter = filter;
+
+            document.querySelectorAll('.results-header .filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderCurrentView();
+        }
+
+        // Sort table
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortAscending = !sortAscending;
+            } else {
+                sortColumn = column;
+                sortAscending = true;
+            }
+            renderTableView();
+        }
+
+        // Clear results
+        function clearResults() {
+            if (isMonitoring) {
+                showNotification('Stop monitoring first', 'error');
+                return;
+            }
+            results.clear();
+            pingHistory.clear();
+            renderCurrentView();
+            updateStatistics();
+            document.getElementById('statsSection').style.display = 'none';
+        }
+
+        // Export to CSV
+        function exportCSV() {
+            if (results.size === 0) {
+                showNotification('No results to export', 'error');
+                return;
+            }
+
+            const headers = ['IP Address', 'Hostname', 'Status', 'Avg Ping (ms)', 'Min Ping (ms)', 'Max Ping (ms)', 'Packets Sent', 'Packets Received', 'Loss %', 'TTL', 'Last Update'];
+            const rows = Array.from(results.values()).map(r => [
+                r.ip,
+                r.hostname || 'N/A',
+                r.status,
+                r.avg_ping_ms !== null ? r.avg_ping_ms.toFixed(1) : 'N/A',
+                r.min_ping_ms !== null ? r.min_ping_ms.toFixed(1) : 'N/A',
+                r.max_ping_ms !== null ? r.max_ping_ms.toFixed(1) : 'N/A',
+                r.packets_sent,
+                r.packets_received,
+                r.packet_loss_percent.toFixed(0),
+                r.ttl || 'N/A',
+                new Date(r.last_update).toLocaleString()
+            ]);
+
+            const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ping_results_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification('CSV exported successfully', 'success');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

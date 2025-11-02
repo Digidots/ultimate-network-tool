@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"C:\\Users\\bas\\Digidots\\All-Data-Digidots-Basrose - Prive\\Digidots apps\\MTU checker\")",
+      "Bash(node --version)",
+      "Bash(node -c temp_script.js)",
+      "Bash(find . -type f -name \"*[<>:\"\"/\\|?*]*\")",
+      "Bash(dir /s /b)",
+      "Bash(findstr /i \"nul CON PRN AUX CLOCK$ NUL COM LPT\")",
+      "Bash(xcopy \"C:\\Users\\bas\\Digidots\\All-Data-Digidots-Basrose - Prive\\Digidots apps\\Ultimate network tool - UNT\" \"C:\\Users\\bas\\NetworkTools\\UNT\" /E /I /H /Y)",
+      "Bash(robocopy \"C:\\Users\\bas\\Digidots\\All-Data-Digidots-Basrose - Prive\\Digidots apps\\Ultimate network tool - UNT\" \"C:\\Users\\bas\\NetworkTools\\UNT\" /E /NFL /NDL /NJH /NJS /nc /ns /np)",
+      "Bash(dir UNT)",
+      "Read(//c/UNT/**)",
+      "Bash(dir /b)",
+      "Bash(dir:*)",
+      "Bash(copy app.py app.py.backup_broken)",
+      "Bash(copy app.py.backup_before_mtu_cleanup app.py)",
+      "Bash(cp:*)",
+      "Bash(cat:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

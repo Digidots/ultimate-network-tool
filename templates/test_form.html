@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FORM TEST</title>
+</head>
+<body>
+    <h1>FORM TEST - ABSOLUTE MINIMAL</h1>
+
+    <form method="POST" action="/mtu-test">
+        <label>Target:</label>
+        <input type="text" name="target" value="8.8.8.8">
+        <br><br>
+        <input type="submit" value="SUBMIT TEST">
+    </form>
+
+    <hr>
+    <p>If clicking SUBMIT TEST does nothing, there's a browser/Flask issue.</p>
+    <p>Check Flask terminal for [MTU-TEST] messages.</p>
+</body>
+</html>

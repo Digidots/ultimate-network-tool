@@ -1,0 +1,35 @@
+# Node modules
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
+release/
+
+# PyInstaller
+*.spec.bak
+*.pyc
+__pycache__/
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.temp

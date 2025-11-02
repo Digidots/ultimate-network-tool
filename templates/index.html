@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Network Tool</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* ===== HAMBURGER MENU (CSS ONLY) ===== */
+        .menu-toggle {
+            display: none;
+        }
+
+        .hamburger {
+            position: absolute;
+            left: 32px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .hamburger:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.25) 100%);
+            border-color: rgba(59, 130, 246, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .hamburger span {
+            display: block;
+            width: 28px;
+            height: 3px;
+            background: #60a5fa;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* Keep hamburger icon when menu is open (no X animation) */
+
+        /* Sidebar menu */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100vh;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            padding: 90px 0 20px 0;
+            overflow-y: auto;
+        }
+
+        .menu-toggle:checked ~ .sidebar {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 20px 24px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .menu-section {
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .menu-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 24px 12px 24px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            border-left-color: #60a5fa;
+        }
+
+        .menu-item.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border-left-color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .menu-item svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+        }
+
+        .menu-item-text {
+            font-size: 14px;
+        }
+
+        /* Overlay when menu is open */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .menu-toggle:checked ~ .menu-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+        }
+
+        .tagline {
+            font-size: 12px;
+            font-weight: 400;
+            color: #94a3b8;
+            letter-spacing: 0.3px;
+        }
+
+        .admin-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            position: absolute;
+            right: 32px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-dot.admin {
+            background: #10b981;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+        }
+
+        .status-dot.not-admin {
+            background: #ef4444;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.9); }
+        }
+
+        .status-text {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #cbd5e1;
+        }
+
+        /* ===== BUTTONS (COMPLETELY NEW DESIGN) ===== */
+        button {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 180px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover:before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button span {
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+
+        /* Primary Button (Purple) */
+        .btn-primary {
+            background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(168, 85, 247, 0.5);
+        }
+
+        /* Success Button (Green) */
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5);
+        }
+
+        /* Danger Button (Red) */
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(239, 68, 68, 0.5);
+        }
+
+        /* Info Button (Blue) */
+        .btn-info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-info:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(59, 130, 246, 0.5);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        /* ===== SVG ICONS ===== */
+        .icon {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        button .icon {
+            margin-top: -2px;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            stroke-width: 1.5;
+        }
+
+        /* ===== NOTIFICATION ===== */
+        .notification {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: rgba(15, 23, 42, 0.98);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            max-width: 350px;
+            z-index: 10000;
+            display: none;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            font-size: 14px;
+            color: #f1f5f9;
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        .notification.success { border-left: 4px solid #10b981; }
+        .notification.error { border-left: 4px solid #ef4444; }
+        .notification.info { border-left: 4px solid #3b82f6; }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ===== ADAPTER SECTION ===== */
+        .adapter-section {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .adapter-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 140px;
+        }
+
+        select {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 10px;
+            padding: 14px 18px;
+            color: #f1f5f9;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .info-badges {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .info-badge {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.08) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 14px 18px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .info-badge:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .info-badge-label {
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .info-badge-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f1f5f9;
+            font-family: 'Consolas', monospace;
+        }
+
+        .info-badge-value:active {
+            color: #10b981;
+        }
+
+        /* ===== SECTIONS ===== */
+        .section-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== INFO ICON (FIXED) ===== */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 900;
+            color: white;
+            cursor: help;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .info-icon:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.1);
+        }
+
+        .info-icon::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 0;
+            bottom: calc(100% + 12px);
+            transform: scale(0.8);
+            background: rgba(15, 23, 42, 0.98);
+            color: #f1f5f9;
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            min-width: 400px;
+            max-width: 600px;
+            width: max-content;
+            white-space: normal;
+            line-height: 1.6;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .info-icon:hover::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .info-icon::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            bottom: calc(100% + 4px);
+            border: 8px solid transparent;
+            border-top-color: rgba(15, 23, 42, 0.98);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .info-icon:hover::before {
+            opacity: 1;
+        }
+
+        /* ===== VLAN CONTROLS ===== */
+        .vlan-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .vlan-mode-toggle {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mode-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            color: #94a3b8;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-color: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        }
+
+        .vlan-input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #f1f5f9;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"] {
+            width: 90px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+        }
+
+        input:hover {
+            border-color: #3b82f6;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 4px;
+            overflow: hidden;
+            display: none;
+            margin-top: 12px;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #34d399 50%, #10b981 100%);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-top: 8px;
+            text-align: center;
+            font-weight: 700;
+            display: none;
+        }
+
+        .progress-text.active {
+            display: block;
+        }
+
+        /* ===== LLDP RESULTS ===== */
+        .lldp-results {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            min-height: 140px;
+            align-content: flex-start;
+        }
+
+        .lldp-badge {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 12px;
+            padding: 10px 14px;
+            min-width: 180px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .lldp-badge:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+            border-color: rgba(59, 130, 246, 0.6);
+        }
+
+        .protocol-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .protocol-badge.lldp {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa !important;
+            border: 1px solid rgba(59, 130, 246, 0.5);
+        }
+
+        .protocol-badge.cdp {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24 !important;
+            border: 1px solid rgba(245, 158, 11, 0.5);
+        }
+
+        .lldp-badge-label {
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .lldp-badge-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f1f5f9;
+            font-family: 'Consolas', monospace;
+        }
+
+        /* ===== VLAN DISPLAY (NEW DESIGN) ===== */
+        .vlan-display {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 140px;
+        }
+
+        /* UNTAGGED VLAN (Orange/Amber color) */
+        .vlan-row.untagged {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%);
+            border: 2px solid rgba(245, 158, 11, 0.5);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+        }
+
+        .vlan-row.untagged:hover {
+            border-color: rgba(245, 158, 11, 0.7);
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .vlan-row.untagged .vlan-row-id {
+            background: rgba(245, 158, 11, 0.3);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.6);
+        }
+
+        .vlan-row.untagged .vlan-type-badge {
+            background: rgba(245, 158, 11, 0.3);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.6);
+        }
+
+        /* TAGGED VLAN (Green color) */
+        .vlan-row.tagged {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.08) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .vlan-row.tagged:hover {
+            border-color: rgba(16, 185, 129, 0.6);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+        }
+
+        .vlan-row.tagged .vlan-row-id {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.5);
+        }
+
+        .vlan-row.tagged .vlan-type-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.5);
+        }
+
+        .vlan-row {
+            padding: 10px 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .vlan-row:hover {
+            transform: translateX(6px);
+        }
+
+        .vlan-row-id {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: 12px;
+            min-width: 75px;
+            text-align: center;
+        }
+
+        .vlan-type-badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            min-width: 85px;
+            text-align: center;
+        }
+
+        .vlan-row-data {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: nowrap;
+            font-size: 11px;
+            font-family: 'Consolas', monospace;
+        }
+
+        .vlan-row-item {
+            display: flex;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .vlan-row-label {
+            color: #94a3b8;
+            font-weight: 700;
+        }
+
+        .vlan-row-value {
+            color: #f1f5f9;
+            font-weight: 700;
+        }
+
+        .vlan-row-value:hover {
+            color: #60a5fa;
+        }
+
+        .vlan-row-value:active {
+            color: #10b981;
+        }
+
+        .vlan-row-separator {
+            color: #475569;
+            font-weight: 300;
+        }
+
+        .dhcp-options-badge {
+            background: rgba(59, 130, 246, 0.2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            cursor: help;
+            transition: all 0.2s ease;
+        }
+
+        .dhcp-options-badge:hover {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.6);
+            transform: scale(1.05);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        /* ===== SPINNER ===== */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <!-- HAMBURGER MENU (CSS ONLY - NO JAVASCRIPT) -->
+    <input type="checkbox" id="menuToggle" class="menu-toggle">
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Network Tools</div>
+            <div class="sidebar-subtitle">Select a tool to use</div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Main Tools</div>
+            <a href="/" class="menu-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="menu-item-text">Home</span>
+            </a>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Discovery Tools</div>
+            <a href="#discovery" class="menu-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <span class="menu-item-text">Switch Discovery</span>
+            </a>
+            <a href="#vlan" class="menu-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+                <span class="menu-item-text">VLAN Detection</span>
+            </a>
+            <a href="/ping" class="menu-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <circle cx="12" cy="12" r="9"></circle>
+                </svg>
+                <span class="menu-item-text">Ping Monitor</span>
+            </a>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Coming Soon</div>
+            <a href="#" class="menu-item" style="opacity: 0.5; pointer-events: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span class="menu-item-text">More Tools Coming...</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Overlay for closing menu -->
+    <label for="menuToggle" class="menu-overlay"></label>
+
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <!-- Hamburger button inside header -->
+            <label for="menuToggle" class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+
+            <div class="title-section">
+                <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="6"/>
+                    <circle cx="12" cy="12" r="2"/>
+                    <line x1="12" y1="2" x2="12" y2="6"/>
+                    <line x1="12" y1="18" x2="12" y2="22"/>
+                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/>
+                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+                    <line x1="2" y1="12" x2="6" y2="12"/>
+                    <line x1="18" y1="12" x2="22" y2="12"/>
+                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/>
+                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+                </svg>
+                <div class="brand-text">
+                    <h1>ULTIMATE NETWORK TOOL</h1>
+                    <span class="tagline">Enterprise Network Discovery & Analysis</span>
+                </div>
+                <div class="admin-status">
+                    <div class="status-dot not-admin" id="statusDot"></div>
+                    <span class="status-text" id="statusText">Checking...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- NOTIFICATION -->
+        <div class="notification" id="notification"></div>
+
+        <!-- ADAPTER SELECTION -->
+        <div class="adapter-section">
+            <div class="adapter-controls">
+                <label>Network Adapter</label>
+                <select id="adapterSelect" onchange="selectAdapter()">
+                    <option value="">Loading adapters...</option>
+                </select>
+                <button class="btn-info" onclick="refreshIP()" id="refreshBtn">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 4v6h-6M1 20v-6h6"/>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                    </svg>
+                    <span>Refresh IP</span>
+                </button>
+            </div>
+            <div class="info-badges" id="adapterInfo"></div>
+        </div>
+
+        <!-- SWITCH DISCOVERY -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title-wrapper">
+                    <h2 class="section-title">Connected Switch Discovery</h2>
+                    <div class="info-icon" data-tooltip="SWITCH DISCOVERY - Passive Network Listening: This tool captures LLDP (Link Layer Discovery Protocol) and CDP (Cisco Discovery Protocol) packets that managed switches broadcast every 30-60 seconds. The tool extracts: Switch Name/Hostname, Connected Port Number, Switch Model, Management IP Address, MAC Address (Chassis ID). This is 100% PASSIVE - no packets are sent to the network. Safe for production networks. Typical wait time: 30-60 seconds for first result.">ℹ</div>
+                </div>
+                <button class="btn-success" id="discoveryBtn" onclick="toggleDiscovery()">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    <span>Start Discovery</span>
+                </button>
+            </div>
+            <div class="lldp-results" id="discoveryResults">
+                <div class="empty-state">Click "Start Discovery" to begin LLDP/CDP detection</div>
+            </div>
+        </div>
+
+        <!-- VLAN DETECTION -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title-wrapper">
+                    <h2 class="section-title">VLAN Detection</h2>
+                    <div class="info-icon" data-tooltip="VLAN DETECTION - Hybrid Active + Passive Scanning: This tool uses TWO methods to detect VLANs: METHOD 1 (Active DHCP Probing): Sends DHCP Discover packets with 802.1Q VLAN tags to each VLAN ID in your range. If a DHCP server responds, the tool captures complete network configuration including IP Range, Subnet Mask, Gateway, DHCP Server IP, Lease Time, Vendor Class (identifies device types like VoIP phones), TFTP Server (provisioning), Domain Name, and Broadcast Address. METHOD 2 (Passive Traffic Listening): Simultaneously listens for any VLAN-tagged Ethernet frames for 60 seconds. Detects VLANs that exist but don't have DHCP servers. Requires at least 5 packets to confirm a VLAN exists (prevents false positives from broadcast storms). RESULTS: Native/Untagged VLANs shown in ORANGE. Tagged VLANs shown in GREEN with all discovered DHCP options listed as numbers - hover over numbers to see full details.">ℹ</div>
+                </div>
+                <button class="btn-success" id="vlanBtn" onclick="toggleVLAN()" disabled>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <span>Scan VLANs</span>
+                </button>
+            </div>
+
+            <div class="vlan-controls">
+                <div class="vlan-mode-toggle">
+                    <button class="mode-btn active" id="modeRange" onclick="setVLANMode('range')">Range Mode</button>
+                    <button class="mode-btn" id="modeSpecific" onclick="setVLANMode('specific')">Specific VLANs</button>
+                </div>
+
+                <div class="vlan-input-row" id="rangeInput">
+                    <label>VLAN Range:</label>
+                    <input type="number" id="vlanStart" value="1" min="1" max="4094">
+                    <span style="color: #64748b; font-weight: 700;">to</span>
+                    <input type="number" id="vlanEnd" value="100" min="1" max="4094">
+                </div>
+
+                <div class="vlan-input-row" id="specificInput" style="display: none;">
+                    <label>VLANs:</label>
+                    <input type="text" id="vlanSpecific" placeholder="e.g., 1,10,20,300 or 1-10,50,100">
+                </div>
+
+                <div class="progress-container" id="vlanProgress">
+                    <div class="progress-bar" id="vlanProgressBar"></div>
+                </div>
+                <div class="progress-text" id="vlanProgressText"></div>
+            </div>
+
+            <div class="vlan-display" id="vlanDisplay">
+                <div class="empty-state">Select adapter and click "Scan VLANs" to detect VLANs</div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">© Digidots 2025</div>
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <script>
+        // ===== GLOBAL STATE =====
+        let socket = null;
+        let discoveryRunning = false;
+        let vlanRunning = false;
+        let adapters = [];
+        let selectedAdapterIndex = -1;
+        let discoveredVLANs = new Map();
+        let nativeVLAN = null;
+        let vlanMode = 'range';
+        let totalVLANsToScan = 0;
+        let scannedVLANs = 0;
+
+        // ===== HELPER FUNCTIONS =====
+        function formatLeaseTime(seconds) {
+            if (!seconds) return 'N/A';
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            if (hours > 24) {
+                const days = Math.floor(hours / 24);
+                return `${days}d ${hours % 24}h`;
+            } else if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+            } else {
+                return `${minutes}m`;
+            }
+        }
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            connectWebSocket();
+            checkStatus();
+            loadAdapters();
+            setupCopyHandlers();
+        });
+
+        // ===== COPY TO CLIPBOARD =====
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification(`Copied: ${text}`, 'success');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        function setupCopyHandlers() {
+            document.addEventListener('click', (e) => {
+                const copyable = e.target.closest('.info-badge-value, .lldp-badge-value, .vlan-row-value');
+                if (copyable) {
+                    const text = copyable.textContent.trim();
+                    if (text && text !== 'N/A') {
+                        copyToClipboard(text);
+                    }
+                }
+            });
+        }
+
+        // ===== WEBSOCKET CONNECTION =====
+        function connectWebSocket() {
+            socket = io();
+
+            socket.on('connect', () => {
+                console.log('WebSocket connected');
+                showNotification('Connected to server', 'success');
+            });
+
+            socket.on('disconnect', () => {
+                console.log('WebSocket disconnected');
+                showNotification('Disconnected from server', 'error');
+            });
+
+            socket.on('error', (data) => {
+                showNotification(data.message, 'error');
+            });
+
+            socket.on('discovery_started', (data) => {
+                showNotification('Discovery started', 'info');
+                document.getElementById('discoveryResults').innerHTML = '<div class="empty-state">Listening for LLDP/CDP packets...</div>';
+            });
+
+            socket.on('discovery_result', (result) => {
+                updateDiscoveryResult(result);
+            });
+
+            socket.on('discovery_stopped', () => {
+                discoveryRunning = false;
+                updateDiscoveryButton();
+                showNotification('Discovery stopped', 'info');
+            });
+
+            // NEW: Handle VLAN discoveries from LLDP/CDP (Fluke-style!)
+            socket.on('vlan_from_lldp', (data) => {
+                console.log('LLDP VLAN Discovery:', data);
+
+                // Create a VLAN result from LLDP discovery
+                let result = {
+                    vlan_id: data.vlan_id,
+                    status: 'Active',
+                    source: data.source,
+                    vlan_name: data.vlan_name || 'N/A',
+                    vlan_type: data.type, // 'native' or 'tagged'
+                    // No DHCP info for LLDP-discovered VLANs (yet)
+                    ip_range: 'N/A',
+                    subnet_mask: 'N/A',
+                    gateway: 'N/A',
+                    dhcp_server: 'N/A',
+                    offered_ip: 'N/A',
+                    lease_time: null,
+                    domain_name: null,
+                    broadcast_address: null,
+                    vendor_specific: null,
+                    vendor_class: null,
+                    tftp_server: null
+                };
+
+                // Add to VLAN results
+                addVLANResult(result);
+
+                // Show notification for first VLAN discovered via LLDP
+                if (!window.lldpNotificationShown) {
+                    showNotification('VLANs detected from LLDP advertisement', 'success');
+                    window.lldpNotificationShown = true;
+                }
+            });
+
+            socket.on('vlan_probe_started', (data) => {
+                showNotification('Scanning VLANs...', 'info');
+                document.getElementById('vlanProgress').classList.add('active');
+                document.getElementById('vlanProgressText').classList.add('active');
+                document.getElementById('vlanProgressBar').style.width = '0%';
+                scannedVLANs = 0;
+
+                // Start countdown timer for passive listening (starts after DHCP completes ~5 seconds)
+                setTimeout(() => {
+                    if (vlanRunning) {
+                        startPassiveListeningCountdown(60);
+                    }
+                }, 8000); // Wait 8 seconds for DHCP probing to complete
+            });
+
+            socket.on('vlan_result', (result) => {
+                // Only count Active VLANs (not Timeout) for progress
+                if (result.status === 'Active') {
+                    scannedVLANs++;
+                    if (totalVLANsToScan > 0) {
+                        const percent = Math.min((scannedVLANs / totalVLANsToScan) * 100, 100);
+                        document.getElementById('vlanProgressBar').style.width = percent + '%';
+                        document.getElementById('vlanProgressText').textContent =
+                            `Found ${scannedVLANs} active VLANs...`;
+                    }
+                }
+                addVLANResult(result);
+            });
+
+            socket.on('vlan_probe_complete', (data) => {
+                vlanRunning = false;
+                updateVLANButton();
+                clearPassiveCountdown();
+                showNotification(`Scan complete: ${data.total} VLANs found`, 'success');
+                document.getElementById('vlanProgress').classList.remove('active');
+                document.getElementById('vlanProgressText').classList.remove('active');
+            });
+
+            socket.on('vlan_probe_stopped', () => {
+                vlanRunning = false;
+                updateVLANButton();
+                clearPassiveCountdown();
+                showNotification('VLAN scan stopped', 'info');
+                document.getElementById('vlanProgress').classList.remove('active');
+                document.getElementById('vlanProgressText').classList.remove('active');
+            });
+        }
+
+        // ===== CHECK ADMIN STATUS =====
+        async function checkStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+
+                const statusDot = document.getElementById('statusDot');
+                const statusText = document.getElementById('statusText');
+
+                if (data.is_admin) {
+                    statusDot.classList.remove('not-admin');
+                    statusDot.classList.add('admin');
+                    statusText.textContent = 'ADMINISTRATOR';
+                } else {
+                    statusDot.classList.remove('admin');
+                    statusDot.classList.add('not-admin');
+                    statusText.textContent = 'NOT ADMIN';
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        }
+
+        // ===== LOAD ADAPTERS =====
+        async function loadAdapters() {
+            try {
+                const response = await fetch('/api/adapters');
+                const data = await response.json();
+
+                adapters = data.adapters;
+                const select = document.getElementById('adapterSelect');
+                select.innerHTML = '';
+
+                if (adapters.length === 0) {
+                    select.innerHTML = '<option value="">No adapters found</option>';
+                    return;
+                }
+
+                adapters.forEach((adapter, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = adapter.name;
+                    select.appendChild(option);
+                });
+
+                select.value = '0';
+                selectAdapter();
+            } catch (error) {
+                console.error('Error loading adapters:', error);
+                showNotification('Failed to load adapters', 'error');
+            }
+        }
+
+        // ===== SELECT ADAPTER =====
+        async function selectAdapter() {
+            const index = document.getElementById('adapterSelect').value;
+            if (index === '') return;
+
+            selectedAdapterIndex = parseInt(index);
+
+            try {
+                const response = await fetch(`/api/adapter/${index}`);
+                const adapter = await response.json();
+
+                const container = document.getElementById('adapterInfo');
+                container.innerHTML = `
+                    <div class="info-badge">
+                        <div class="info-badge-label">IP Address</div>
+                        <div class="info-badge-value copyable" data-copy-label="IP Address" style="cursor: pointer;">${adapter.ip}</div>
+                    </div>
+                    <div class="info-badge">
+                        <div class="info-badge-label">Subnet Mask</div>
+                        <div class="info-badge-value copyable" data-copy-label="Subnet mask" style="cursor: pointer;">${adapter.subnet}</div>
+                    </div>
+                    <div class="info-badge">
+                        <div class="info-badge-label">Gateway</div>
+                        <div class="info-badge-value copyable" data-copy-label="Gateway" style="cursor: pointer;">${adapter.gateway}</div>
+                    </div>
+                    <div class="info-badge">
+                        <div class="info-badge-label">DNS Server</div>
+                        <div class="info-badge-value copyable" data-copy-label="DNS server" style="cursor: pointer;">${adapter.dns}</div>
+                    </div>
+                    <div class="info-badge">
+                        <div class="info-badge-label">DHCP Server</div>
+                        <div class="info-badge-value copyable" data-copy-label="DHCP server" style="cursor: pointer;">${adapter.dhcp}</div>
+                    </div>
+                    <div class="info-badge">
+                        <div class="info-badge-label">MAC Address</div>
+                        <div class="info-badge-value copyable" data-copy-label="MAC address" style="cursor: pointer;">${adapter.mac}</div>
+                    </div>
+                `;
+
+                document.getElementById('vlanBtn').disabled = false;
+                showNotification('Adapter selected', 'success');
+            } catch (error) {
+                console.error('Error selecting adapter:', error);
+                showNotification('Failed to load adapter info', 'error');
+            }
+        }
+
+        // ===== REFRESH IP =====
+        async function refreshIP() {
+            if (selectedAdapterIndex === -1) {
+                showNotification('Please select an adapter first', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('refreshBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span><span>Refreshing...</span>';
+
+            try {
+                const response = await fetch('/api/refresh-ip', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adapter_index: selectedAdapterIndex })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification('IP address refreshed', 'success');
+                    setTimeout(() => selectAdapter(), 2000);
+                } else {
+                    showNotification('Failed to refresh IP: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error refreshing IP:', error);
+                showNotification('Failed to refresh IP', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 4v6h-6M1 20v-6h6"/>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                    </svg>
+                    <span>Refresh IP</span>`;
+            }
+        }
+
+        // ===== START ALL TESTS =====
+        // ===== VLAN MODE =====
+        function setVLANMode(mode) {
+            vlanMode = mode;
+
+            document.getElementById('modeRange').classList.toggle('active', mode === 'range');
+            document.getElementById('modeSpecific').classList.toggle('active', mode === 'specific');
+
+            document.getElementById('rangeInput').style.display = mode === 'range' ? 'flex' : 'none';
+            document.getElementById('specificInput').style.display = mode === 'specific' ? 'flex' : 'none';
+        }
+
+        // ===== GET VLAN LIST =====
+        function getVLANList() {
+            if (vlanMode === 'range') {
+                const start = parseInt(document.getElementById('vlanStart').value);
+                const end = parseInt(document.getElementById('vlanEnd').value);
+                const list = [];
+                for (let i = start; i <= end; i++) {
+                    list.push(i);
+                }
+                console.log('VLAN List (Range Mode):', list);
+                return list;
+            } else {
+                const input = document.getElementById('vlanSpecific').value;
+                console.log('VLAN Input (Specific Mode):', input);
+                const vlans = new Set();
+
+                const parts = input.split(',');
+                for (const part of parts) {
+                    const trimmed = part.trim();
+                    if (trimmed.includes('-')) {
+                        const [start, end] = trimmed.split('-').map(x => parseInt(x.trim()));
+                        for (let i = start; i <= end; i++) {
+                            if (i >= 1 && i <= 4094) vlans.add(i);
+                        }
+                    } else {
+                        const vlan = parseInt(trimmed);
+                        if (!isNaN(vlan) && vlan >= 1 && vlan <= 4094) {
+                            vlans.add(vlan);
+                        }
+                    }
+                }
+
+                const result = Array.from(vlans).sort((a, b) => a - b);
+                console.log('VLAN List (Specific Mode):', result);
+                return result;
+            }
+        }
+
+        // ===== TOGGLE DISCOVERY =====
+        function toggleDiscovery() {
+            if (selectedAdapterIndex === -1) {
+                showNotification('Please select an adapter first', 'error');
+                return;
+            }
+
+            if (discoveryRunning) {
+                socket.emit('stop_discovery');
+                discoveryRunning = false;
+                updateDiscoveryButton();
+            } else {
+                socket.emit('start_discovery', {});
+                discoveryRunning = true;
+                updateDiscoveryButton();
+            }
+        }
+
+        function updateDiscoveryButton() {
+            const btn = document.getElementById('discoveryBtn');
+            if (discoveryRunning) {
+                btn.className = 'btn-danger';
+                btn.innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="6" y="6" width="12" height="12"/>
+                    </svg>
+                    <span>Stop Discovery</span>`;
+            } else {
+                btn.className = 'btn-success';
+                btn.innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    <span>Start Discovery</span>`;
+            }
+        }
+
+        // ===== UPDATE DISCOVERY RESULT =====
+        function updateDiscoveryResult(result) {
+            const container = document.getElementById('discoveryResults');
+
+            // Create new badge structure matching other info badges - all on one line
+            // Order: Discovery Type, Switch Name, Switch IP, Port ID, MAC, Model
+            container.innerHTML = `
+                <div class="lldp-badge">
+                    <div class="lldp-badge-label">Discovery Type</div>
+                    <div class="lldp-badge-value copyable" data-copy-label="Discovery type" style="cursor: pointer;">${result.protocol}</div>
+                </div>
+                <div class="lldp-badge">
+                    <div class="lldp-badge-label">Switch Name</div>
+                    <div class="lldp-badge-value copyable" data-copy-label="Switch name" style="cursor: pointer;">${result.switch_name}</div>
+                </div>
+                <div class="lldp-badge">
+                    <div class="lldp-badge-label">Switch IP</div>
+                    <div class="lldp-badge-value copyable" data-copy-label="Switch IP" style="cursor: pointer;">${result.ip_address}</div>
+                </div>
+                <div class="lldp-badge">
+                    <div class="lldp-badge-label">Port ID</div>
+                    <div class="lldp-badge-value copyable" data-copy-label="Port ID" style="cursor: pointer;">${result.port_id}</div>
+                </div>
+                <div class="lldp-badge">
+                    <div class="lldp-badge-label">MAC Address</div>
+                    <div class="lldp-badge-value copyable" data-copy-label="MAC address" style="cursor: pointer;">${result.mac_address || 'N/A'}</div>
+                </div>
+                <div class="lldp-badge">
+                    <div class="lldp-badge-label">Model</div>
+                    <div class="lldp-badge-value copyable" data-copy-label="Switch model" style="cursor: pointer;">${result.model}</div>
+                </div>
+            `;
+        }
+
+        // ===== TOGGLE VLAN =====
+        function toggleVLAN() {
+            if (selectedAdapterIndex === -1) {
+                showNotification('Please select an adapter first', 'error');
+                return;
+            }
+
+            if (vlanRunning) {
+                socket.emit('stop_vlan_probe');
+                vlanRunning = false;
+                updateVLANButton();
+            } else {
+                const vlanList = getVLANList();
+
+                if (vlanList.length === 0) {
+                    showNotification('Please enter valid VLANs', 'error');
+                    return;
+                }
+
+                discoveredVLANs.clear();
+                nativeVLAN = null;
+                totalVLANsToScan = vlanList.length;
+                scannedVLANs = 0;
+                document.getElementById('vlanDisplay').innerHTML = '<div class="empty-state">Scanning for VLANs...</div>';
+
+                socket.emit('start_vlan_probe', {
+                    start: Math.min(...vlanList),
+                    end: Math.max(...vlanList),
+                    specific: vlanMode === 'specific' ? vlanList : null
+                });
+                vlanRunning = true;
+                updateVLANButton();
+            }
+        }
+
+        function updateVLANButton() {
+            const btn = document.getElementById('vlanBtn');
+            if (vlanRunning) {
+                btn.className = 'btn-danger';
+                btn.innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="6" y="6" width="12" height="12"/>
+                    </svg>
+                    <span>Stop Scan</span>`;
+            } else {
+                btn.className = 'btn-success';
+                btn.innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <span>Scan VLANs</span>`;
+            }
+        }
+
+        // ===== ADD VLAN RESULT =====
+        function addVLANResult(result) {
+            // Only add VLANs with status 'Active' or 'Detected'
+            if (result.status === 'Active' || result.status === 'Detected') {
+                // Add ALL active/detected VLANs regardless of DHCP info
+                // This includes:
+                // 1. VLANs with DHCP response (have IP range, gateway, etc.)
+                // 2. VLANs detected via passive listening (no DHCP info but confirmed present)
+                // 3. Native/Untagged VLANs
+
+                if (result.source === 'Native/Untagged' && !nativeVLAN) {
+                    nativeVLAN = result;
+                } else {
+                    discoveredVLANs.set(result.vlan_id, result);
+                }
+                updateVLANDisplay();
+            }
+        }
+
+        // ===== UPDATE VLAN DISPLAY (NEW WITH TAGGED/UNTAGGED) =====
+        function updateVLANDisplay() {
+            const container = document.getElementById('vlanDisplay');
+            container.innerHTML = '';
+
+            if (!nativeVLAN && discoveredVLANs.size === 0) {
+                container.innerHTML = '<div class="empty-state">No VLANs detected yet...</div>';
+                return;
+            }
+
+            // Show UNTAGGED VLAN first (if exists)
+            if (nativeVLAN) {
+                const vlanRow = document.createElement('div');
+                vlanRow.className = 'vlan-row untagged';
+                vlanRow.innerHTML = `
+                    <div class="vlan-row-id">VLAN ${nativeVLAN.vlan_id}</div>
+                    <div class="vlan-type-badge">UNTAGGED</div>
+                    <div class="vlan-row-data">
+                        <div class="vlan-row-item">
+                            <span class="vlan-row-label">Source:</span>
+                            <span class="vlan-row-value">${nativeVLAN.source}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(vlanRow);
+            }
+
+            // Show TAGGED VLANs
+            if (discoveredVLANs.size > 0) {
+                const sortedVLANs = Array.from(discoveredVLANs.keys()).sort((a, b) => a - b);
+
+                sortedVLANs.forEach(vlanId => {
+                    const result = discoveredVLANs.get(vlanId);
+                    const vlanRow = document.createElement('div');
+                    vlanRow.className = 'vlan-row tagged';
+
+                    // Build VLAN row HTML with conditional DHCP fields
+                    // Show VLAN name if available (from LLDP)
+                    let vlanHeader = `VLAN ${vlanId}`;
+                    if (result.vlan_name && result.vlan_name !== 'N/A') {
+                        vlanHeader += ` <span style="font-size: 0.85em; font-weight: normal; color: #999;">(${result.vlan_name})</span>`;
+                    }
+
+                    let rowHTML = `
+                        <div class="vlan-row-id">${vlanHeader}</div>
+                        <div class="vlan-type-badge">TAGGED</div>
+                        <div class="vlan-row-data">
+                            <div class="vlan-row-item">
+                                <span class="vlan-row-label">IP Range:</span>
+                                <span class="vlan-row-value copyable" data-copy-label="IP Range" style="cursor: pointer;">${result.ip_range || 'N/A'}</span>
+                            </div>
+                            <span class="vlan-row-separator">|</span>
+                            <div class="vlan-row-item">
+                                <span class="vlan-row-label">Subnet:</span>
+                                <span class="vlan-row-value copyable" data-copy-label="Subnet mask" style="cursor: pointer;">${result.subnet_mask || 'N/A'}</span>
+                            </div>
+                            <span class="vlan-row-separator">|</span>
+                            <div class="vlan-row-item">
+                                <span class="vlan-row-label">Gateway:</span>
+                                <span class="vlan-row-value copyable" data-copy-label="Gateway" style="cursor: pointer;">${result.gateway || 'N/A'}</span>
+                            </div>
+                            <span class="vlan-row-separator">|</span>
+                            <div class="vlan-row-item">
+                                <span class="vlan-row-label">DHCP:</span>
+                                <span class="vlan-row-value copyable" data-copy-label="DHCP server" style="cursor: pointer;">${result.dhcp_server || 'N/A'}</span>
+                            </div>`;
+
+                    // Add lease time if available
+                    if (result.lease_time) {
+                        rowHTML += `
+                            <span class="vlan-row-separator">|</span>
+                            <div class="vlan-row-item">
+                                <span class="vlan-row-label">Lease:</span>
+                                <span class="vlan-row-value copyable" data-copy-label="Lease time" style="cursor: pointer;">${formatLeaseTime(result.lease_time)}</span>
+                            </div>`;
+                    }
+
+                    // Add vendor class if available (Option 60)
+                    if (result.vendor_class) {
+                        rowHTML += `
+                            <span class="vlan-row-separator">|</span>
+                            <div class="vlan-row-item">
+                                <span class="vlan-row-label">Vendor:</span>
+                                <span class="vlan-row-value copyable" data-copy-text="${result.vendor_class}" data-copy-label="Vendor class" title="${result.vendor_class}" style="cursor: pointer;">${result.vendor_class.substring(0, 20)}${result.vendor_class.length > 20 ? '...' : ''}</span>
+                            </div>`;
+                    }
+
+                    // Add TFTP server if available (Option 66)
+                    if (result.tftp_server) {
+                        rowHTML += `
+                            <span class="vlan-row-separator">|</span>
+                            <div class="vlan-row-item">
+                                <span class="vlan-row-label">TFTP:</span>
+                                <span class="vlan-row-value copyable" data-copy-label="TFTP server" style="cursor: pointer;">${result.tftp_server}</span>
+                            </div>`;
+                    }
+
+                    rowHTML += `
+                            <span class="vlan-row-separator">|</span>
+                            <div class="vlan-row-item">
+                                <span class="vlan-row-label">Source:</span>
+                                <span class="vlan-row-value copyable" data-copy-label="Source" style="cursor: pointer;">${result.source}</span>
+                            </div>`;
+
+                    // Collect ALL DHCP options for comprehensive display
+                    let allOptions = [];
+
+                    // Main options (always show if available)
+                    if (result.subnet_mask && result.subnet_mask !== 'N/A') {
+                        allOptions.push({num: 1, name: 'Subnet Mask', value: result.subnet_mask, priority: true});
+                    }
+                    if (result.gateway && result.gateway !== 'N/A') {
+                        allOptions.push({num: 3, name: 'Router/Gateway', value: result.gateway, priority: true});
+                    }
+                    if (result.dhcp_server && result.dhcp_server !== 'N/A') {
+                        allOptions.push({num: 54, name: 'DHCP Server', value: result.dhcp_server, priority: true});
+                    }
+
+                    // Additional options
+                    if (result.domain_name) {
+                        allOptions.push({num: 15, name: 'Domain', value: result.domain_name, priority: false});
+                    }
+                    if (result.broadcast_address) {
+                        allOptions.push({num: 28, name: 'Broadcast', value: result.broadcast_address, priority: false});
+                    }
+                    if (result.vendor_specific) {
+                        allOptions.push({num: 43, name: 'Vendor-Specific', value: result.vendor_specific, priority: false});
+                    }
+                    if (result.lease_time) {
+                        allOptions.push({num: 51, name: 'Lease Time', value: formatLeaseTime(result.lease_time), priority: false});
+                    }
+                    if (result.vendor_class) {
+                        allOptions.push({num: 60, name: 'Vendor Class', value: result.vendor_class, priority: false});
+                    }
+                    if (result.tftp_server) {
+                        allOptions.push({num: 66, name: 'TFTP Server', value: result.tftp_server, priority: false});
+                    }
+
+                    // Add "DHCP Options" badge showing ALL options
+                    if (allOptions.length > 0) {
+                        const optionsList = allOptions.map(opt => `Option ${opt.num} (${opt.name}): ${opt.value}`).join('\n');
+                        const optionNumbers = allOptions.map(opt => opt.num).join(', ');
+                        const optionsListEscaped = optionsList.replace(/"/g, '&quot;');
+                        rowHTML += `
+                            <span class="vlan-row-separator">|</span>
+                            <span class="vlan-row-label">DHCP Opts:</span>
+                            <span class="vlan-row-value dhcp-options-badge copyable" title="${optionsListEscaped}" data-copy-text="${optionsListEscaped}" data-copy-label="DHCP options" style="cursor: pointer;">${optionNumbers}</span>`;
+                    }
+
+                    rowHTML += `
+                        </div>
+                    `;
+
+                    vlanRow.innerHTML = rowHTML;
+                    container.appendChild(vlanRow);
+                });
+            }
+        }
+
+        // ===== SHOW NOTIFICATION =====
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Passive listening countdown timer
+        let passiveCountdownInterval = null;
+
+        function startPassiveListeningCountdown(seconds) {
+            // Clear any existing countdown
+            if (passiveCountdownInterval) {
+                clearInterval(passiveCountdownInterval);
+            }
+
+            let remaining = seconds;
+            const progressText = document.getElementById('vlanProgressText');
+
+            // Update immediately
+            progressText.textContent = `Listening for non-DHCP VLANs (${remaining}s remaining)...`;
+
+            // Start countdown
+            passiveCountdownInterval = setInterval(() => {
+                remaining--;
+                if (remaining > 0 && vlanRunning) {
+                    progressText.textContent = `Listening for non-DHCP VLANs (${remaining}s remaining)...`;
+                } else {
+                    clearInterval(passiveCountdownInterval);
+                    passiveCountdownInterval = null;
+                }
+            }, 1000);
+        }
+
+        // Clear countdown when scan completes or stops
+        function clearPassiveCountdown() {
+            if (passiveCountdownInterval) {
+                clearInterval(passiveCountdownInterval);
+                passiveCountdownInterval = null;
+            }
+        }
+
+        // Generic copy to clipboard function with visual feedback
+        function copyToClipboard(element, text, label = 'Text') {
+            // Get text from data attribute if not provided
+            if (!text) {
+                text = element.getAttribute('data-copy-text') || element.textContent;
+            }
+
+            // Decode HTML entities
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = text;
+            const decodedText = textarea.value;
+
+            navigator.clipboard.writeText(decodedText).then(() => {
+                // Visual feedback
+                const originalText = element.textContent;
+                const originalColor = element.style.color;
+                element.textContent = '✓ Copied!';
+                element.style.color = '#10b981';
+
+                setTimeout(() => {
+                    element.textContent = originalText;
+                    element.style.color = originalColor;
+                }, 1500);
+
+                showNotification(`${label} copied to clipboard`, 'success');
+            }).catch(err => {
+                showNotification('Failed to copy to clipboard', 'error');
+                console.error('Copy failed:', err);
+            });
+        }
+
+        // Add click listeners to all copyable elements when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('click', (e) => {
+                const copyable = e.target.closest('.copyable');
+                if (copyable) {
+                    const label = copyable.getAttribute('data-copy-label') || 'Text';
+                    copyToClipboard(copyable, null, label);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

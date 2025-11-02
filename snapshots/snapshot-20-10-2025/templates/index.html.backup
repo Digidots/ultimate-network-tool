@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Network Tool</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .admin-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.15);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-dot.admin {
+            background: #10b981;
+            box-shadow: 0 0 16px rgba(16, 185, 129, 0.6);
+        }
+
+        .status-dot.not-admin {
+            background: #ef4444;
+            box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.95); }
+        }
+
+        .status-text {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Notification Banner */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 12px 18px;
+            max-width: 320px;
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-size: 13px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        .notification.success { border-left: 3px solid #10b981; }
+        .notification.error { border-left: 3px solid #ef4444; }
+        .notification.info { border-left: 3px solid #60a5fa; }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px) scale(0.9); opacity: 0; }
+            to { transform: translateX(0) scale(1); opacity: 1; }
+        }
+
+        /* Adapter Section */
+        .adapter-section {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .adapter-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            min-width: 140px;
+        }
+
+        select {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #e2e8f0;
+            font-size: 14px;
+            flex: 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Info Cards (like VLAN badges) */
+        .info-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .info-badge {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 10px 16px;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .info-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        .info-badge-label {
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 4px;
+        }
+
+        .info-badge-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+            font-family: 'Consolas', monospace;
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Section Card */
+        .section-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Buttons - FIX: Remove ::before that was covering text */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-refresh {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-refresh:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-all {
+            background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-all:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn:active {
+            transform: translateY(0) !important;
+        }
+
+        /* VLAN Controls */
+        .vlan-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .vlan-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #e2e8f0;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"] {
+            width: 80px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+        }
+
+        input:hover {
+            border-color: #3b82f6;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        .vlan-mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .mode-btn {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        /* LLDP Results as badges */
+        .lldp-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .lldp-badge {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            min-width: 220px;
+            transition: all 0.3s ease;
+        }
+
+        .lldp-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        .lldp-badge-label {
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .lldp-badge-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e2e8f0;
+            font-family: 'Consolas', monospace;
+        }
+
+        .protocol-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .protocol-badge.lldp {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+
+        .protocol-badge.cdp {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        /* VLAN Display */
+        .vlan-display {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 150px;
+        }
+
+        .native-vlan-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            box-shadow: 0 0 24px rgba(16, 185, 129, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .native-vlan-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 32px rgba(16, 185, 129, 0.3);
+        }
+
+        .native-label {
+            font-size: 11px;
+            color: #6ee7b7;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .native-value {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagged-vlans {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .tagged-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+        }
+
+        .vlan-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .vlan-badge {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Consolas', monospace;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        .vlan-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+            border-color: rgba(59, 130, 246, 0.6);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #64748b;
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #475569;
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="title-section">
+                <h1>🔍 Ultimate Network Tool</h1>
+                <div class="admin-status">
+                    <div class="status-dot not-admin" id="statusDot"></div>
+                    <span class="status-text" id="statusText">Checking...</span>
+                </div>
+            </div>
+            <button class="btn btn-all" onclick="startAllTests()" id="allTestsBtn">
+                ⚡ Start All Tests
+            </button>
+        </div>
+
+        <!-- Notification Banner -->
+        <div class="notification" id="notification"></div>
+
+        <!-- Adapter Selection -->
+        <div class="adapter-section">
+            <div class="adapter-row">
+                <label>Network Adapter</label>
+                <select id="adapterSelect" onchange="selectAdapter()">
+                    <option value="">Loading adapters...</option>
+                </select>
+                <button class="btn btn-refresh" onclick="refreshIP()" id="refreshBtn">
+                    🔄 Refresh IP
+                </button>
+            </div>
+
+            <!-- Adapter Info as Badges -->
+            <div class="info-badges" id="adapterInfo">
+                <!-- Will be populated dynamically -->
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Switch Discovery -->
+            <div class="section-card">
+                <div class="section-title">
+                    <span>Switch Discovery</span>
+                    <button class="btn btn-primary" id="discoveryBtn" onclick="toggleDiscovery()">
+                        ▶ Start
+                    </button>
+                </div>
+                <div class="lldp-badges" id="discoveryResults">
+                    <div class="empty-state">
+                        Click "Start" to begin LLDP/CDP discovery
+                    </div>
+                </div>
+            </div>
+
+            <!-- VLAN Detection -->
+            <div class="section-card">
+                <div class="section-title">
+                    <span>VLAN Detection</span>
+                    <button class="btn btn-primary" id="vlanBtn" onclick="toggleVLAN()" disabled>
+                        ▶ Scan
+                    </button>
+                </div>
+
+                <div class="vlan-controls">
+                    <div class="vlan-mode-toggle">
+                        <button class="mode-btn active" id="modeRange" onclick="setVLANMode('range')">Range Mode</button>
+                        <button class="mode-btn" id="modeSpecific" onclick="setVLANMode('specific')">Specific VLANs</button>
+                    </div>
+
+                    <div class="vlan-input-row" id="rangeInput">
+                        <label>Range:</label>
+                        <input type="number" id="vlanStart" value="1" min="1" max="4094">
+                        <span style="color: #64748b;">to</span>
+                        <input type="number" id="vlanEnd" value="100" min="1" max="4094">
+                    </div>
+
+                    <div class="vlan-input-row" id="specificInput" style="display: none;">
+                        <label>VLANs:</label>
+                        <input type="text" id="vlanSpecific" placeholder="e.g., 1,10,20,300 or 1-10,50,100">
+                    </div>
+                </div>
+
+                <div class="vlan-display" id="vlanDisplay">
+                    <div class="empty-state">
+                        Select adapter and click "Scan" to detect VLANs
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            Copyright © Digidots 2025
+        </div>
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <script>
+        // Global state
+        let socket = null;
+        let discoveryRunning = false;
+        let vlanRunning = false;
+        let adapters = [];
+        let selectedAdapterIndex = -1;
+        let discoveredVLANs = new Map(); // Store VLAN ID -> result object
+        let nativeVLAN = null;
+        let vlanMode = 'range'; // 'range' or 'specific'
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            connectWebSocket();
+            checkStatus();
+            loadAdapters();
+        });
+
+        // WebSocket Connection
+        function connectWebSocket() {
+            socket = io();
+
+            socket.on('connect', () => {
+                console.log('WebSocket connected');
+                showNotification('Connected to server', 'success');
+            });
+
+            socket.on('disconnect', () => {
+                console.log('WebSocket disconnected');
+                showNotification('Disconnected from server', 'error');
+            });
+
+            socket.on('error', (data) => {
+                showNotification(data.message, 'error');
+            });
+
+            socket.on('discovery_started', (data) => {
+                showNotification(`Discovery started`, 'info');
+                document.getElementById('discoveryResults').innerHTML = '<div class="empty-state">Listening for LLDP/CDP packets...</div>';
+            });
+
+            socket.on('discovery_result', (result) => {
+                updateDiscoveryResult(result);
+            });
+
+            socket.on('discovery_stopped', () => {
+                discoveryRunning = false;
+                updateDiscoveryButton();
+                showNotification('Discovery stopped', 'info');
+            });
+
+            socket.on('vlan_probe_started', (data) => {
+                showNotification(`Scanning VLANs...`, 'info');
+            });
+
+            socket.on('vlan_result', (result) => {
+                addVLANResult(result);
+            });
+
+            socket.on('vlan_probe_complete', (data) => {
+                vlanRunning = false;
+                updateVLANButton();
+                showNotification(`Scan complete: ${data.total} VLANs found`, 'success');
+            });
+
+            socket.on('vlan_probe_stopped', () => {
+                vlanRunning = false;
+                updateVLANButton();
+                showNotification('VLAN scan stopped', 'info');
+            });
+        }
+
+        // Check admin status
+        async function checkStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+
+                const statusDot = document.getElementById('statusDot');
+                const statusText = document.getElementById('statusText');
+
+                if (data.is_admin) {
+                    statusDot.classList.remove('not-admin');
+                    statusDot.classList.add('admin');
+                    statusText.textContent = 'ADMINISTRATOR';
+                } else {
+                    statusDot.classList.remove('admin');
+                    statusDot.classList.add('not-admin');
+                    statusText.textContent = 'NOT ADMIN';
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        }
+
+        // Load adapters
+        async function loadAdapters() {
+            try {
+                const response = await fetch('/api/adapters');
+                const data = await response.json();
+
+                adapters = data.adapters;
+                const select = document.getElementById('adapterSelect');
+                select.innerHTML = '';
+
+                if (adapters.length === 0) {
+                    select.innerHTML = '<option value="">No adapters found</option>';
+                    return;
+                }
+
+                adapters.forEach((adapter, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = adapter.name;
+                    select.appendChild(option);
+                });
+
+                // Auto-select first adapter
+                select.value = '0';
+                selectAdapter();
+            } catch (error) {
+                console.error('Error loading adapters:', error);
+                showNotification('Failed to load adapters', 'error');
+            }
+        }
+
+        // Select adapter - Show as badges
+        async function selectAdapter() {
+            const index = document.getElementById('adapterSelect').value;
+            if (index === '') return;
+
+            selectedAdapterIndex = parseInt(index);
+
+            try {
+                const response = await fetch(`/api/adapter/${index}`);
+                const adapter = await response.json();
+
+                // Create badge-style display
+                const container = document.getElementById('adapterInfo');
+                container.innerHTML = `
+                    <div class="info-badge">
+                        <div class="info-badge-label">IP Address</div>
+                        <div class="info-badge-value">${adapter.ip}</div>
+                    </div>
+                    <div class="info-badge">
+                        <div class="info-badge-label">Subnet Mask</div>
+                        <div class="info-badge-value">${adapter.subnet}</div>
+                    </div>
+                    <div class="info-badge">
+                        <div class="info-badge-label">Gateway</div>
+                        <div class="info-badge-value">${adapter.gateway}</div>
+                    </div>
+                    <div class="info-badge">
+                        <div class="info-badge-label">DNS Server</div>
+                        <div class="info-badge-value">${adapter.dns}</div>
+                    </div>
+                    <div class="info-badge">
+                        <div class="info-badge-label">DHCP Server</div>
+                        <div class="info-badge-value">${adapter.dhcp}</div>
+                    </div>
+                    <div class="info-badge">
+                        <div class="info-badge-label">MAC Address</div>
+                        <div class="info-badge-value">${adapter.mac}</div>
+                    </div>
+                `;
+
+                // Enable VLAN button
+                document.getElementById('vlanBtn').disabled = false;
+
+                showNotification('Adapter selected', 'success');
+            } catch (error) {
+                console.error('Error selecting adapter:', error);
+                showNotification('Failed to load adapter info', 'error');
+            }
+        }
+
+        // Refresh IP address
+        async function refreshIP() {
+            if (selectedAdapterIndex === -1) {
+                showNotification('Please select an adapter first', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('refreshBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Refreshing...';
+
+            try {
+                const response = await fetch('/api/refresh-ip', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adapter_index: selectedAdapterIndex })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification('IP address refreshed', 'success');
+                    setTimeout(() => selectAdapter(), 2000);
+                } else {
+                    showNotification('Failed to refresh IP: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error refreshing IP:', error);
+                showNotification('Failed to refresh IP', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔄 Refresh IP';
+            }
+        }
+
+        // Start All Tests
+        async function startAllTests() {
+            if (selectedAdapterIndex === -1) {
+                showNotification('Please select an adapter first', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('allTestsBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Running Tests...';
+
+            showNotification('Starting all network tests...', 'info');
+
+            // Start Discovery
+            socket.emit('start_discovery', {});
+            discoveryRunning = true;
+            updateDiscoveryButton();
+
+            // Wait a bit, then start VLAN scan
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            const vlanList = getVLANList();
+            if (vlanList.length > 0) {
+                socket.emit('start_vlan_probe', {
+                    start: Math.min(...vlanList),
+                    end: Math.max(...vlanList),
+                    specific: vlanMode === 'specific' ? vlanList : null
+                });
+                vlanRunning = true;
+                updateVLANButton();
+            }
+
+            // Auto-stop after 15 seconds
+            setTimeout(() => {
+                if (discoveryRunning) {
+                    socket.emit('stop_discovery');
+                    discoveryRunning = false;
+                    updateDiscoveryButton();
+                }
+                if (vlanRunning) {
+                    socket.emit('stop_vlan_probe');
+                    vlanRunning = false;
+                    updateVLANButton();
+                }
+                btn.disabled = false;
+                btn.innerHTML = '⚡ Start All Tests';
+                showNotification('All tests completed', 'success');
+            }, 15000);
+        }
+
+        // Set VLAN Mode
+        function setVLANMode(mode) {
+            vlanMode = mode;
+
+            document.getElementById('modeRange').classList.toggle('active', mode === 'range');
+            document.getElementById('modeSpecific').classList.toggle('active', mode === 'specific');
+
+            document.getElementById('rangeInput').style.display = mode === 'range' ? 'flex' : 'none';
+            document.getElementById('specificInput').style.display = mode === 'specific' ? 'flex' : 'none';
+        }
+
+        // Get VLAN List
+        function getVLANList() {
+            if (vlanMode === 'range') {
+                const start = parseInt(document.getElementById('vlanStart').value);
+                const end = parseInt(document.getElementById('vlanEnd').value);
+                const list = [];
+                for (let i = start; i <= end; i++) {
+                    list.push(i);
+                }
+                return list;
+            } else {
+                const input = document.getElementById('vlanSpecific').value;
+                const vlans = new Set();
+
+                // Parse input: "1,2,3,4-10,20,300"
+                const parts = input.split(',');
+                for (const part of parts) {
+                    const trimmed = part.trim();
+                    if (trimmed.includes('-')) {
+                        const [start, end] = trimmed.split('-').map(x => parseInt(x.trim()));
+                        for (let i = start; i <= end; i++) {
+                            if (i >= 1 && i <= 4094) vlans.add(i);
+                        }
+                    } else {
+                        const vlan = parseInt(trimmed);
+                        if (vlan >= 1 && vlan <= 4094) vlans.add(vlan);
+                    }
+                }
+
+                return Array.from(vlans).sort((a, b) => a - b);
+            }
+        }
+
+        // Toggle Discovery
+        function toggleDiscovery() {
+            if (selectedAdapterIndex === -1) {
+                showNotification('Please select an adapter first', 'error');
+                return;
+            }
+
+            if (discoveryRunning) {
+                socket.emit('stop_discovery');
+                discoveryRunning = false;
+                updateDiscoveryButton();
+            } else {
+                socket.emit('start_discovery', {});
+                discoveryRunning = true;
+                updateDiscoveryButton();
+            }
+        }
+
+        function updateDiscoveryButton() {
+            const btn = document.getElementById('discoveryBtn');
+            if (discoveryRunning) {
+                btn.innerHTML = '■ Stop';
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-danger');
+            } else {
+                btn.innerHTML = '▶ Start';
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-primary');
+            }
+        }
+
+        // UPDATE discovery result as badges
+        function updateDiscoveryResult(result) {
+            const container = document.getElementById('discoveryResults');
+            const protocol = result.protocol.toLowerCase();
+
+            container.innerHTML = `
+                <div class="protocol-badge ${protocol}">${result.protocol}</div>
+                <div class="lldp-badge">
+                    <div class="lldp-badge-label">Switch Name</div>
+                    <div class="lldp-badge-value">${result.switch_name}</div>
+                </div>
+                <div class="lldp-badge">
+                    <div class="lldp-badge-label">Port ID</div>
+                    <div class="lldp-badge-value">${result.port_id}</div>
+                </div>
+                <div class="lldp-badge">
+                    <div class="lldp-badge-label">Model</div>
+                    <div class="lldp-badge-value">${result.model}</div>
+                </div>
+                <div class="lldp-badge">
+                    <div class="lldp-badge-label">IP Address</div>
+                    <div class="lldp-badge-value">${result.ip_address}</div>
+                </div>
+            `;
+        }
+
+        // Toggle VLAN
+        function toggleVLAN() {
+            if (selectedAdapterIndex === -1) {
+                showNotification('Please select an adapter first', 'error');
+                return;
+            }
+
+            if (vlanRunning) {
+                socket.emit('stop_vlan_probe');
+                vlanRunning = false;
+                updateVLANButton();
+            } else {
+                const vlanList = getVLANList();
+
+                if (vlanList.length === 0) {
+                    showNotification('Please enter valid VLANs', 'error');
+                    return;
+                }
+
+                // Clear previous results
+                discoveredVLANs.clear();
+                nativeVLAN = null;
+                document.getElementById('vlanDisplay').innerHTML = '<div class="empty-state">Scanning for VLANs...</div>';
+
+                socket.emit('start_vlan_probe', {
+                    start: Math.min(...vlanList),
+                    end: Math.max(...vlanList),
+                    specific: vlanMode === 'specific' ? vlanList : null
+                });
+                vlanRunning = true;
+                updateVLANButton();
+            }
+        }
+
+        function updateVLANButton() {
+            const btn = document.getElementById('vlanBtn');
+            if (vlanRunning) {
+                btn.innerHTML = '■ Stop';
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-danger');
+            } else {
+                btn.innerHTML = '▶ Scan';
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-primary');
+            }
+        }
+
+        // Add VLAN result with DHCP information
+        function addVLANResult(result) {
+            if (result.status === 'Active') {
+                if (result.source === 'Native/Untagged' && !nativeVLAN) {
+                    nativeVLAN = result.vlan_id;
+                } else {
+                    // Store full result object with DHCP info
+                    discoveredVLANs.set(result.vlan_id, result);
+                }
+                updateVLANDisplay();
+            }
+        }
+
+        // Update VLAN display with DHCP information
+        function updateVLANDisplay() {
+            const container = document.getElementById('vlanDisplay');
+            container.innerHTML = '';
+
+            if (!nativeVLAN && discoveredVLANs.size === 0) {
+                container.innerHTML = '<div class="empty-state">No VLANs detected yet...</div>';
+                return;
+            }
+
+            // Native VLAN card
+            if (nativeVLAN) {
+                const nativeCard = document.createElement('div');
+                nativeCard.className = 'native-vlan-card';
+                nativeCard.innerHTML = `
+                    <div class="native-label">Native / Untagged VLAN</div>
+                    <div class="native-value">VLAN ${nativeVLAN}</div>
+                `;
+                container.appendChild(nativeCard);
+            }
+
+            // Tagged VLANs with DHCP information
+            if (discoveredVLANs.size > 0) {
+                // Sort VLANs
+                const sortedVLANs = Array.from(discoveredVLANs.keys()).sort((a, b) => a - b);
+
+                // Create badge for each VLAN with DHCP info
+                sortedVLANs.forEach(vlanId => {
+                    const result = discoveredVLANs.get(vlanId);
+                    const vlanCard = document.createElement('div');
+                    vlanCard.className = 'lldp-badges';  // Reuse badge styling
+                    vlanCard.style.marginBottom = '12px';
+
+                    vlanCard.innerHTML = `
+                        <div class="protocol-badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4);">VLAN ${vlanId}</div>
+                        <div class="lldp-badge">
+                            <div class="lldp-badge-label">IP Range</div>
+                            <div class="lldp-badge-value">${result.ip_range || 'N/A'}</div>
+                        </div>
+                        <div class="lldp-badge">
+                            <div class="lldp-badge-label">Subnet Mask</div>
+                            <div class="lldp-badge-value">${result.subnet_mask || 'N/A'}</div>
+                        </div>
+                        <div class="lldp-badge">
+                            <div class="lldp-badge-label">Gateway</div>
+                            <div class="lldp-badge-value">${result.gateway || 'N/A'}</div>
+                        </div>
+                        <div class="lldp-badge">
+                            <div class="lldp-badge-label">DHCP Server</div>
+                            <div class="lldp-badge-value">${result.dhcp_server || 'N/A'}</div>
+                        </div>
+                    `;
+                    container.appendChild(vlanCard);
+                });
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

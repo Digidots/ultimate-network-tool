@@ -1,0 +1,115 @@
+═══════════════════════════════════════════════════════════════════
+  ULTIMATE NETWORK TOOL - Snapshot 20-10-2025
+═══════════════════════════════════════════════════════════════════
+
+SESSION SUMMARY:
+This snapshot contains a stable working version with hamburger menu,
+optimized VLAN scanning, and comprehensive copy functionality.
+
+═══════════════════════════════════════════════════════════════════
+CHANGES MADE IN THIS SESSION:
+═══════════════════════════════════════════════════════════════════
+
+1. HAMBURGER MENU (Pure CSS - No JavaScript)
+   ✓ Added hamburger menu button inside header box (left side)
+   ✓ Slides in from left with smooth animations
+   ✓ Menu sections: Main Tools, Discovery Tools, Coming Soon
+   ✓ Click overlay or hamburger to close
+   ✓ Logo centered in header
+   ✓ Admin status badge on right side
+   ✓ Ready to add new tool pages
+
+2. SWITCH DISCOVERY - FIELD REORDER
+   ✓ New order: Discovery Type, Switch Name, Switch IP, Port ID, MAC, Model
+   ✓ More logical flow from general to specific info
+
+3. VLAN DETECTION OPTIMIZATION
+   ✓ Backend: Skip 60-second passive listening if all VLANs detected via DHCP
+   ✓ Counts only requested VLANs (excludes native VLAN from count)
+   ✓ Massive speed improvement: ~10 seconds instead of 70 seconds when all VLANs have DHCP
+   ✓ Frontend: Countdown timer showing "Listening for non-DHCP VLANs (XX seconds remaining)"
+   ✓ Timer automatically starts after DHCP probing completes
+
+4. DHCP OPTIONS DISPLAY FIX
+   ✓ "DHCP Opts:" label now inline with other text (was in separate div)
+   ✓ Consistent layout with Lease, Source, etc.
+
+5. COPY TO CLIPBOARD - COMPREHENSIVE
+   ✓ Added click-to-copy functionality to ALL values
+   ✓ Visual feedback: "✓ Copied!" in green for 1.5 seconds
+   ✓ Notification: "{Item} copied to clipboard"
+   ✓ Cursor changes to pointer on hover
+
+   Copyable Items:
+   • Network Adapter Info: IP, Subnet, Gateway, DNS, DHCP, MAC
+   • Switch Discovery: Type, Name, IP, Port, MAC, Model
+   • VLAN Detection: IP Range, Subnet, Gateway, DHCP, Lease, Vendor, TFTP, Source
+   • DHCP Options: Copies FULL details (e.g., "Option 1 (Subnet Mask): 255.255.255.0")
+
+6. VLAN INPUT PARSING FIX
+   ✓ Added debug logging to console
+   ✓ Fixed NaN handling in VLAN parsing
+   ✓ Now correctly parses comma-separated VLANs (e.g., 1,10,11,12)
+
+═══════════════════════════════════════════════════════════════════
+FILES MODIFIED:
+═══════════════════════════════════════════════════════════════════
+
+Backend:
+• vlan_probe.py - Optimized passive listening logic
+• app.py - Restored from backup (no changes in final version)
+
+Frontend:
+• templates/index.html - Major updates:
+  - Hamburger menu CSS and HTML
+  - Copy functionality for all values
+  - VLAN countdown timer
+  - DHCP Opts inline layout
+  - Switch discovery field order
+  - Debug logging for VLAN parsing
+
+═══════════════════════════════════════════════════════════════════
+TESTING NOTES:
+═══════════════════════════════════════════════════════════════════
+
+✓ Hamburger menu works correctly (opens/closes)
+✓ VLAN scanning with all DHCP: ~10 seconds (skips passive listening)
+✓ VLAN scanning with some non-DHCP: 60+ seconds with countdown timer
+✓ Copy functionality works on all values with visual feedback
+✓ DHCP Opts copies full details, not just numbers
+✓ All existing functionality preserved
+
+═══════════════════════════════════════════════════════════════════
+KNOWN ISSUES / LIMITATIONS:
+═══════════════════════════════════════════════════════════════════
+
+• Passive listening thread still starts but exits early if all VLANs detected
+• Could be further optimized to not start passive thread at all
+• VLAN 13 (no DHCP) detection requires full 60-second passive scan
+
+═══════════════════════════════════════════════════════════════════
+NEXT STEPS / FUTURE ENHANCEMENTS:
+═══════════════════════════════════════════════════════════════════
+
+• Add MTU Discovery tool to hamburger menu
+• Add more network tools as separate pages
+• Export VLAN results to CSV/JSON
+• Add VLAN filtering by DHCP options
+• Historical VLAN tracking
+
+═══════════════════════════════════════════════════════════════════
+RESTORE INSTRUCTIONS:
+═══════════════════════════════════════════════════════════════════
+
+To restore this snapshot:
+
+1. Stop the application (Ctrl+C)
+2. Copy files from snapshot:
+   cp -r "snapshots/snapshot-20-10-2025/templates" .
+   cp "snapshots/snapshot-20-10-2025"/*.py .
+   cp -r "snapshots/snapshot-20-10-2025/modules" .
+3. Restart: python app.py
+
+═══════════════════════════════════════════════════════════════════
+© Digidots 2025 - Ultimate Network Tool v2.0
+═══════════════════════════════════════════════════════════════════

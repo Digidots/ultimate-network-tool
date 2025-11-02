@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTU Path Discovery Tool</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #60a5fa;
+        }
+
+        .admin-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-dot.admin {
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        .status-dot.not-admin {
+            background: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-text {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-help {
+            background: rgba(96, 165, 250, 0.1);
+            color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+
+        .btn-help:hover {
+            background: rgba(96, 165, 250, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Input Section */
+        .input-section {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: #e2e8f0;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Graph Visualization */
+        .graph-section {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #60a5fa;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #mtuGraph {
+            width: 100%;
+            height: 350px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            position: relative;
+        }
+
+        /* Statistics Panel */
+        .stats-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .stat-value.good { color: #10b981; }
+        .stat-value.warning { color: #f59e0b; }
+        .stat-value.bad { color: #ef4444; }
+
+        /* Real-time Testing Display */
+        .testing-display {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .testing-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .testing-info {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #60a5fa;
+        }
+
+        .test-progress {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        /* Discovery Logs - Bottom */
+        .logs-section {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .log-container {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.05);
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            color: #64748b;
+            margin-right: 10px;
+        }
+
+        .log-icon {
+            margin-right: 8px;
+        }
+
+        /* Protocol Info Box */
+        .protocol-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #93c5fd;
+        }
+
+        /* Detailed Table */
+        .results-section {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        /* Filter Row */
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-select {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #e2e8f0;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .filter-reset {
+            padding: 8px 15px;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-reset:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .hop-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .hop-table thead {
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .hop-table th {
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .hop-table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.05);
+            font-size: 14px;
+        }
+
+        .hop-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .hop-table tbody tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .hop-number {
+            font-weight: 700;
+            color: #60a5fa;
+            font-size: 16px;
+        }
+
+        .hostname {
+            font-family: 'Courier New', monospace;
+            color: #e2e8f0;
+        }
+
+        .ip-address {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .mtu-dual {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .mtu-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mtu-label-small {
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+            width: 60px;
+        }
+
+        .mtu-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .mtu-badge.optimal {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .mtu-badge.reduced {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .mtu-badge.unreachable {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .status-badge.optimal {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .status-badge.reduced {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .status-badge.unreachable {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* Export Buttons */
+        .export-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .btn-export {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-csv {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-json {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-print {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Help Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 16px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #60a5fa;
+        }
+
+        .close-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .help-section {
+            margin-bottom: 25px;
+        }
+
+        .help-section h3 {
+            color: #60a5fa;
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-section p {
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .help-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .help-section li {
+            color: #cbd5e1;
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .help-section li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #60a5fa;
+        }
+
+        .code-block {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #10b981;
+            margin: 10px 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            margin: 15px 0;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .comparison-table th {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            color: #cbd5e1;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #60a5fa;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 15px 20px;
+            color: #ef4444;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="title-section">
+                <h1>🔍 MTU Path Discovery Tool</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-help" onclick="showHelp()">❓ Help</button>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <div class="input-row">
+                <div class="input-group">
+                    <label>🎯 Target Host/IP</label>
+                    <input type="text" id="targetHost" placeholder="e.g., 8.8.8.8 or google.com" value="8.8.8.8">
+                </div>
+                <div class="input-group">
+                    <button class="btn btn-primary" id="startBtn" onclick="startDiscovery()">🚀 Start Discovery</button>
+                </div>
+            </div>
+            <!-- Hidden fields -->
+            <input type="hidden" id="protocol" value="TCP">
+            <input type="hidden" id="maxMtu" value="16000">
+            <div class="protocol-info" id="protocolInfo">
+                ℹ️ Auto-discovers maximum MTU using Windows ping | Tests with and without Don't Fragment flag | No artificial limits
+            </div>
+            <div class="error-message" id="errorMsg"></div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- MTU Graph Visualization -->
+            <div class="graph-section">
+                <div class="section-title">📈 MTU Path Graph</div>
+                <canvas id="mtuGraph"></canvas>
+                
+                <!-- Real-time Testing Display -->
+                <div class="testing-display" id="testingDisplay" style="display: none;">
+                    <div class="testing-label">Currently Testing</div>
+                    <div class="testing-info" id="testingInfo">Hop #4: 198.51.100.1</div>
+                    <div class="test-progress" id="testProgress">
+                        Testing: 1500B → 1472B → 1450B...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Stats -->
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <div class="stat-label">Total Hops</div>
+                    <div class="stat-value" id="totalHops">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Lowest MTU</div>
+                    <div class="stat-value good" id="lowestMtu">N/A</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Target Capacity (DF=0)</div>
+                    <div class="stat-value good" id="targetCapacity">N/A</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Bottleneck at</div>
+                    <div class="stat-value warning" id="bottleneck">None</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Test Duration</div>
+                    <div class="stat-value" id="duration">0s</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Table -->
+        <div class="results-section">
+            <div class="section-title">📊 Detailed Hop Information</div>
+            
+            <!-- Filter Row -->
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label">Filter Path MTU</label>
+                    <select class="filter-select" id="filterPathMtu" onchange="applyFilters()">
+                        <option value="all">All Values</option>
+                        <option value="1500">1500 bytes (Optimal)</option>
+                        <option value="lt1500">&lt; 1500 bytes (Reduced)</option>
+                        <option value="1472">1472 bytes</option>
+                        <option value="1400">1400 bytes</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Filter Hop Capacity</label>
+                    <select class="filter-select" id="filterHopCapacity" onchange="applyFilters()">
+                        <option value="all">All Values</option>
+                        <option value="1500">1500 bytes (Optimal)</option>
+                        <option value="lt1500">&lt; 1500 bytes (Reduced)</option>
+                        <option value="gt1500">&gt; 1500 bytes (Jumbo)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Filter Status</label>
+                    <select class="filter-select" id="filterStatus" onchange="applyFilters()">
+                        <option value="all">All Status</option>
+                        <option value="optimal">Optimal</option>
+                        <option value="reduced">Reduced / Path Limited</option>
+                        <option value="unreachable">Unreachable</option>
+                    </select>
+                </div>
+                <button class="filter-reset" onclick="resetFilters()">🔄 Reset</button>
+            </div>
+            
+            <table class="hop-table">
+                <thead>
+                    <tr>
+                        <th>HOP</th>
+                        <th>HOSTNAME</th>
+                        <th>IP ADDRESS</th>
+                        <th>PATH MTU (DF=1)</th>
+                        <th>HOP CAPACITY (DF=0)</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="hopTableBody">
+                    <!-- Demo data -->
+                    <tr data-path-mtu="1500" data-hop-capacity="1500" data-status="optimal">
+                        <td class="hop-number">#1</td>
+                        <td class="hostname">192.168.1.1</td>
+                        <td class="ip-address">192.168.1.1</td>
+                        <td><span class="mtu-badge optimal">1500 bytes</span></td>
+                        <td><span class="mtu-badge optimal">1500 bytes</span></td>
+                        <td><span class="status-badge optimal">✅ Optimal</span></td>
+                    </tr>
+                    <tr data-path-mtu="1500" data-hop-capacity="1500" data-status="optimal">
+                        <td class="hop-number">#2</td>
+                        <td class="hostname">10.0.0.1</td>
+                        <td class="ip-address">10.0.0.1</td>
+                        <td><span class="mtu-badge optimal">1500 bytes</span></td>
+                        <td><span class="mtu-badge optimal">1500 bytes</span></td>
+                        <td><span class="status-badge optimal">✅ Optimal</span></td>
+                    </tr>
+                    <tr data-path-mtu="1500" data-hop-capacity="1500" data-status="optimal">
+                        <td class="hop-number">#3</td>
+                        <td class="hostname">203.0.113.1</td>
+                        <td class="ip-address">203.0.113.1</td>
+                        <td><span class="mtu-badge optimal">1500 bytes</span></td>
+                        <td><span class="mtu-badge optimal">1500 bytes</span></td>
+                        <td><span class="status-badge optimal">✅ Optimal</span></td>
+                    </tr>
+                    <tr data-path-mtu="1472" data-hop-capacity="1500" data-status="reduced">
+                        <td class="hop-number">#4</td>
+                        <td class="hostname">198.51.100.1</td>
+                        <td class="ip-address">198.51.100.1</td>
+                        <td><span class="mtu-badge reduced">1472 bytes</span></td>
+                        <td><span class="mtu-badge optimal">1500 bytes</span></td>
+                        <td><span class="status-badge reduced">⚠️ Path Limited</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="export-actions">
+                <button class="btn-export btn-csv" onclick="exportCSV()">📄 Export CSV</button>
+                <button class="btn-export btn-json" onclick="exportJSON()">📋 Export JSON</button>
+                <button class="btn-export btn-print" onclick="printReport()">🖨️ Print Report</button>
+            </div>
+        </div>
+
+        <!-- Discovery Logs - Bottom -->
+        <div class="logs-section">
+            <div class="section-title">📋 Discovery Log</div>
+            <div class="log-container" id="logContainer">
+                <div class="log-entry">
+                    <span class="log-time">00:00:00</span>
+                    <span class="log-icon">ℹ️</span>
+                    <span>Ready to discover MTU path...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📚 MTU Discovery Tool - Complete Guide</h2>
+                <button class="close-btn" onclick="closeHelp()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-section">
+                    <h3>🎯 What is MTU?</h3>
+                    <p>Maximum Transmission Unit (MTU) is the largest packet size that can be transmitted over a network without fragmentation. The standard MTU is 1500 bytes for Ethernet networks.</p>
+                </div>
+
+                <div class="help-section">
+                    <h3>🔬 How MTU Path Discovery Works</h3>
+                    <p><strong>This tool discovers the PATH MTU (bottleneck) by sending packets with the Don't Fragment (DF) bit set to each hop:</strong></p>
+
+                    <div class="code-block">
+How it works:
+1. Sends packets with increasing TTL (1, 2, 3...) and DF=1
+2. Each router decrements TTL and forwards the packet
+3. When TTL reaches 0, router sends back "TTL Expired"
+4. If packet is too large, router sends "Fragmentation Needed"
+5. Binary search finds exact MTU for each hop
+                    </div>
+
+                    <p><strong>⚠️ CRITICAL LIMITATION - The Bottleneck Problem:</strong></p>
+                    <div class="code-block">
+WHAT WE CAN DISCOVER:
+
+Scenario A - Declining MTU:
+Hop 1: 1500B ✓ (We discover this)
+Hop 2: 1400B ✓ (We discover this - packet reaches it)
+Hop 3: 1300B ✓ (We discover this - packet reaches it)
+
+Result: We see the bottleneck narrowing at each hop
+
+
+WHAT WE CANNOT DISCOVER:
+
+Scenario B - Bottleneck then Higher MTU:
+Hop 1: 1500B ✓ (We discover this)
+Hop 2: 1400B ✓ (We discover this - BOTTLENECK!)
+Hop 3: 2000B ❌ (We CANNOT discover this!)
+
+Why? Hop 2 drops packets > 1400B BEFORE they reach Hop 3!
+We never learn that Hop 3 supports 2000B.
+
+
+REAL-WORLD EXAMPLE:
+
+Your PC    : 1500B
+Router 1   : 1500B  ← We see 1500B
+VPN Gateway: 1400B  ← We see 1400B (BOTTLENECK!)
+Internet   : 9000B  ← We see 1400B (can't discover true 9000B!)
+
+The VPN tunnel limits us to 1400B, hiding any higher MTU beyond it.
+                    </div>
+
+                    <p><strong>What the results actually mean:</strong></p>
+                    <ul>
+                        <li><strong>Path MTU</strong> = Lowest MTU from your PC to this hop (cumulative bottleneck)</li>
+                        <li>Once you hit a bottleneck, all following hops show the SAME MTU</li>
+                        <li>You can only discover the MINIMUM MTU in the path, not individual hop capabilities</li>
+                        <li>To discover Hop 3's true capacity, you'd need to test FROM Hop 2</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>⚙️ How Don't Fragment (DF) Bit Works</h3>
+                    <div class="code-block">
+Test with DF=1 (Don't Fragment):
+Router sees 1501 byte packet with DF=1
+Router's MTU = 1500 bytes
+Router DROPS packet and sends ICMP error
+Tool detects: Path MTU = 1500 bytes
+
+Test with DF=0 (Fragmentation Allowed):
+Router sees 1600 byte packet with DF=0
+Router's MTU = 1500 bytes  
+Router FRAGMENTS packet into smaller pieces
+Destination receives and reassembles
+Tool detects: Hop Capacity = 1600 bytes
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <h3>🔍 Understanding the Results Table</h3>
+                    <p><strong>Path MTU (DF=1):</strong> Shows cumulative bottleneck from your computer to this hop</p>
+                    <p><strong>Hop Capacity (DF=0):</strong> Shows what this specific hop can handle</p>
+                    <p><strong>Status Indicators:</strong></p>
+                    <ul>
+                        <li>✅ <strong>Optimal:</strong> MTU is 1500 bytes (standard Ethernet)</li>
+                        <li>⚠️ <strong>Path Limited:</strong> This hop can do more, but earlier hop limits it</li>
+                        <li>⚠️ <strong>Reduced:</strong> This hop is the actual bottleneck</li>
+                        <li>❌ <strong>Unreachable:</strong> Hop did not respond to probes</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>🔧 How It Works</h3>
+                    <p>This tool uses the Windows <code>ping</code> command with the Don't Fragment (<code>-f</code>) flag to perform MTU discovery. This approach:</p>
+                    <ul>
+                        <li>Works without administrator privileges</li>
+                        <li>No special dependencies or raw socket access needed</li>
+                        <li>Uses native Windows networking (ICMP Echo Request/Reply)</li>
+                        <li>28 bytes overhead (20B IP header + 8B ICMP header)</li>
+                        <li>Reliable and compatible with most networks</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>💻 Windows Network Adapter Limitations</h3>
+                    <p><strong>⚠️ IMPORTANT: Windows PCs have a default maximum MTU of 1500 bytes on Ethernet adapters.</strong></p>
+
+                    <div class="code-block">
+Default Windows MTU Limits:
+• Ethernet: 1500 bytes (standard)
+• Wi-Fi: 1500 bytes (standard)
+• VPN: Typically 1400-1450 bytes (encryption overhead)
+• PPPoE: 1492 bytes (1500 - 8 byte PPPoE header)
+                    </div>
+
+                    <p><strong>Enabling Jumbo Frames (MTU > 1500):</strong></p>
+                    <ul>
+                        <li>Open Device Manager → Network Adapters</li>
+                        <li>Right-click your network adapter → Properties</li>
+                        <li>Advanced tab → Look for "Jumbo Packet" or "Jumbo Frame"</li>
+                        <li>Change from "Disabled" to desired size (e.g., 9000 bytes)</li>
+                        <li><strong>NOTE:</strong> All devices in the path must support jumbo frames!</li>
+                        <li><strong>WARNING:</strong> Misconfiguration can break network connectivity</li>
+                    </ul>
+
+                    <p><strong>Why use jumbo frames?</strong></p>
+                    <ul>
+                        <li>Reduces CPU overhead (fewer packets to process)</li>
+                        <li>Improves throughput for large file transfers</li>
+                        <li>Common in data centers and storage networks</li>
+                        <li>Requires compatible switches and routers</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>🛡️ No Administrator Required</h3>
+                    <p>This tool works without administrator privileges! It uses the built-in Windows <code>ping</code> command which:</p>
+                    <ul>
+                        <li>Runs with normal user permissions</li>
+                        <li>Automatically sets the Don't Fragment bit with the <code>-f</code> flag</li>
+                        <li>Controls TTL with the <code>-i</code> flag for hop-specific testing</li>
+                        <li>Handles ICMP responses natively</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>💡 Troubleshooting Tips</h3>
+                    <ul>
+                        <li>If hops show "Unreachable", the router may not respond to ICMP or blocks fragmentation messages</li>
+                        <li>VPN users: Expect lower MTU (typically 1400-1450 bytes due to encryption overhead)</li>
+                        <li>PPPoE users: Standard MTU is 1492 bytes (1500 - 8 byte PPPoE header)</li>
+                        <li>If Path MTU and Hop Capacity differ significantly, investigate that router for configuration issues</li>
+                        <li>Some corporate firewalls may block ICMP entirely - results may be incomplete</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>📈 Best Practices</h3>
+                    <ul>
+                        <li>Always compare Path MTU vs Hop Capacity for each hop</li>
+                        <li>Run multiple tests for consistency</li>
+                        <li>Test during normal network conditions (not during heavy traffic)</li>
+                        <li>Document results before/after network changes</li>
+                        <li>If many hops show unreachable, the network may block ICMP probes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentResults = [];
+        let allResults = []; // Unfiltered results
+        let isElectron = typeof window.electronAPI !== 'undefined';
+        let graphCanvas, graphCtx;
+        let startTime;
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAdminStatus();
+            initializeGraph();
+            setupEventListeners();
+        });
+
+        // Setup IPC event listeners for Electron
+        function setupEventListeners() {
+            if (!isElectron) return;
+
+            console.log('[RENDERER] Setting up IPC event listeners');
+
+            // Listen for hop results
+            window.electronAPI.onHopResult((result) => {
+                console.log('[RENDERER] Received hop-result event:', result);
+                addLog('✅', `Hop ${result.hop}: ${result.ip} - Path MTU: ${result.pathMtu}B, Capacity: ${result.hopCapacity}B`);
+                addHopToTable(result.hop, result);
+                drawGraph(allResults);
+                updateStats(allResults);
+            });
+
+            // Listen for discovery complete
+            window.electronAPI.onDiscoveryComplete((results) => {
+                console.log('[RENDERER] Received discovery-complete event:', results);
+                addLog('✅', `Discovery complete! Found ${results.length} hops`);
+                hideTestingProgress();
+
+                const btn = document.getElementById('startBtn');
+                btn.innerHTML = '🚀 Start Discovery';
+                btn.disabled = false;
+
+                const duration = Math.round((Date.now() - startTime) / 1000);
+                document.getElementById('duration').textContent = `${duration}s`;
+            });
+
+            // Listen for discovery errors
+            window.electronAPI.onDiscoveryError((error) => {
+                console.error('[RENDERER] Received discovery-error event:', error);
+                const errorMsg = document.getElementById('errorMsg');
+                errorMsg.textContent = `❌ Error: ${error}`;
+                errorMsg.classList.add('show');
+                addLog('❌', `Error: ${error}`);
+
+                hideTestingProgress();
+                const btn = document.getElementById('startBtn');
+                btn.innerHTML = '🚀 Start Discovery';
+                btn.disabled = false;
+            });
+
+            // Listen for discovery status updates
+            window.electronAPI.onDiscoveryStatus((status) => {
+                console.log('[RENDERER] Received discovery-status event:', status);
+                if (status.step === 'mtu-test') {
+                    showTestingProgress(status.hopNumber, status.hopIp, ['Testing...']);
+                    addLog('🔍', status.message);
+                } else if (status.step === 'traceroute') {
+                    addLog('📡', status.message);
+                }
+            });
+
+            // Listen for hops discovered
+            window.electronAPI.onHopsDiscovered((hops) => {
+                console.log('[RENDERER] Received hops-discovered event:', hops);
+                addLog('✅', `Discovered ${hops.length} hops in path`);
+                drawGraph([]);  // Initialize empty graph
+            });
+
+            // Listen for direct capacity test result
+            window.electronAPI.onDirectCapacityResult((result) => {
+                console.log('[RENDERER] Received direct-capacity-result event:', result);
+                addLog('🎯', `Direct capacity test (DF=0) to ${result.targetIp}: ${result.capacity} bytes`);
+
+                // Update the Target Capacity stat card
+                const targetCapEl = document.getElementById('targetCapacity');
+                if (result.capacity > 0) {
+                    targetCapEl.textContent = `${result.capacity} bytes`;
+                    targetCapEl.className = result.capacity >= 1500 ? 'stat-value good' : 'stat-value warning';
+                } else {
+                    targetCapEl.textContent = 'N/A';
+                    targetCapEl.className = 'stat-value bad';
+                }
+            });
+        }
+
+        // Protocol info - no longer needed (TCP only)
+
+        // Initialize graph
+        function initializeGraph() {
+            graphCanvas = document.getElementById('mtuGraph');
+            graphCtx = graphCanvas.getContext('2d');
+            
+            // Set canvas size
+            const rect = graphCanvas.getBoundingClientRect();
+            graphCanvas.width = rect.width * window.devicePixelRatio;
+            graphCanvas.height = rect.height * window.devicePixelRatio;
+            graphCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            
+            drawEmptyGraph();
+        }
+
+        function drawEmptyGraph() {
+            const ctx = graphCtx;
+            const width = graphCanvas.width / window.devicePixelRatio;
+            const height = graphCanvas.height / window.devicePixelRatio;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw placeholder text
+            ctx.fillStyle = '#64748b';
+            ctx.font = '14px "Segoe UI"';
+            ctx.textAlign = 'center';
+            ctx.fillText('Start discovery to see MTU path graph', width / 2, height / 2);
+        }
+
+        function drawGraph(hops) {
+            const ctx = graphCtx;
+            const width = graphCanvas.width / window.devicePixelRatio;
+            const height = graphCanvas.height / window.devicePixelRatio;
+            const padding = 60;
+            const graphWidth = width - 2 * padding;
+            const graphHeight = height - 2 * padding;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            if (hops.length === 0) {
+                drawEmptyGraph();
+                return;
+            }
+            
+            // Find min/max MTU for scaling
+            const mtuValues = hops.map(h => Math.min(h.pathMtu, h.hopCapacity));
+            const maxMtu = Math.max(...mtuValues, 1500);
+            const minMtu = Math.min(...mtuValues);
+            const mtuRange = maxMtu - minMtu || 100;
+            
+            // Draw grid lines
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (graphHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+            }
+            
+            // Draw Y-axis labels
+            ctx.fillStyle = '#64748b';
+            ctx.font = '11px "Segoe UI"';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const value = maxMtu - (mtuRange / 5) * i;
+                const y = padding + (graphHeight / 5) * i;
+                ctx.fillText(Math.round(value), padding - 10, y + 4);
+            }
+            
+            // Y-axis label
+            ctx.save();
+            ctx.translate(20, height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.textAlign = 'center';
+            ctx.fillText('MTU (bytes)', 0, 0);
+            ctx.restore();
+            
+            // Draw X-axis labels
+            ctx.textAlign = 'center';
+            const xSpacing = graphWidth / (hops.length - 1 || 1);
+            hops.forEach((hop, i) => {
+                const x = padding + xSpacing * i;
+                ctx.fillText(i + 1, x, height - padding + 20);
+            });
+            
+            // X-axis label
+            ctx.fillText('Hop Number', width / 2, height - 10);
+            
+            // Function to get Y position for MTU value
+            const getY = (mtu) => {
+                const normalized = (maxMtu - mtu) / mtuRange;
+                return padding + graphHeight * normalized;
+            };
+            
+            // Draw line
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            hops.forEach((hop, i) => {
+                const x = padding + xSpacing * i;
+                const y = getY(hop.pathMtu);
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            
+            // Draw nodes and labels
+            hops.forEach((hop, i) => {
+                const x = padding + xSpacing * i;
+                const y = getY(hop.pathMtu || 0);  // Handle 0 MTU
+
+                // Node circle - check for unreachable status
+                const isUnreachable = hop.pathMtu === 0 || hop.status === 'unreachable';
+                const isOptimal = hop.pathMtu >= 1500;
+
+                if (isUnreachable) {
+                    ctx.fillStyle = '#ef4444';  // Red for unreachable
+                } else if (isOptimal) {
+                    ctx.fillStyle = '#10b981';  // Green for optimal
+                } else {
+                    ctx.fillStyle = '#f59e0b';  // Orange for reduced
+                }
+
+                ctx.beginPath();
+                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Node border
+                if (isUnreachable) {
+                    ctx.strokeStyle = '#f87171';  // Light red border
+                } else if (isOptimal) {
+                    ctx.strokeStyle = '#34d399';  // Light green border
+                } else {
+                    ctx.strokeStyle = '#fbbf24';  // Light orange border
+                }
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // MTU label above node
+                ctx.fillStyle = '#e2e8f0';
+                ctx.font = 'bold 13px "Segoe UI"';
+                ctx.textAlign = 'center';
+                const label = isUnreachable ? '0' : hop.pathMtu.toString();
+                ctx.fillText(label, x, y - 15);
+            });
+        }
+
+        // Filter functions
+        function applyFilters() {
+            const pathFilter = document.getElementById('filterPathMtu').value;
+            const capFilter = document.getElementById('filterHopCapacity').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+            
+            const rows = document.querySelectorAll('#hopTableBody tr');
+            
+            rows.forEach(row => {
+                const pathMtu = parseInt(row.getAttribute('data-path-mtu'));
+                const hopCap = parseInt(row.getAttribute('data-hop-capacity'));
+                const status = row.getAttribute('data-status');
+                
+                let showRow = true;
+                
+                // Path MTU filter
+                if (pathFilter !== 'all') {
+                    if (pathFilter === '1500' && pathMtu !== 1500) showRow = false;
+                    if (pathFilter === 'lt1500' && pathMtu >= 1500) showRow = false;
+                    if (pathFilter === '1472' && pathMtu !== 1472) showRow = false;
+                    if (pathFilter === '1400' && pathMtu !== 1400) showRow = false;
+                }
+                
+                // Hop Capacity filter
+                if (capFilter !== 'all') {
+                    if (capFilter === '1500' && hopCap !== 1500) showRow = false;
+                    if (capFilter === 'lt1500' && hopCap >= 1500) showRow = false;
+                    if (capFilter === 'gt1500' && hopCap <= 1500) showRow = false;
+                }
+                
+                // Status filter
+                if (statusFilter !== 'all') {
+                    if (statusFilter !== status) showRow = false;
+                }
+                
+                row.style.display = showRow ? '' : 'none';
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('filterPathMtu').value = 'all';
+            document.getElementById('filterHopCapacity').value = 'all';
+            document.getElementById('filterStatus').value = 'all';
+            applyFilters();
+        }
+
+        // Add log entry
+        function addLog(icon, message) {
+            const container = document.getElementById('logContainer');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <span class="log-time">${time}</span>
+                <span class="log-icon">${icon}</span>
+                <span>${message}</span>
+            `;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTestingProgress(hopNum, ip, sizes) {
+            const display = document.getElementById('testingDisplay');
+            const info = document.getElementById('testingInfo');
+            const progress = document.getElementById('testProgress');
+            
+            display.style.display = 'block';
+            info.textContent = `Hop #${hopNum}: ${ip}`;
+            progress.textContent = `Testing: ${sizes.join(' → ')}...`;
+        }
+
+        function hideTestingProgress() {
+            document.getElementById('testingDisplay').style.display = 'none';
+        }
+
+        async function checkAdminStatus() {
+            // Admin status check removed - no longer needed for TCP-only mode
+            // Status indicator now just shows "Ready"
+        }
+
+        function showHelp() {
+            document.getElementById('helpModal').classList.add('show');
+        }
+
+        function closeHelp() {
+            document.getElementById('helpModal').classList.remove('show');
+        }
+
+        async function startDiscovery() {
+            const target = document.getElementById('targetHost').value.trim();
+            const protocol = document.getElementById('protocol').value;
+            const maxMtu = parseInt(document.getElementById('maxMtu').value);
+            const errorMsg = document.getElementById('errorMsg');
+            const btn = document.getElementById('startBtn');
+
+            if (!target) {
+                errorMsg.textContent = '❌ Error: Please enter a valid host or IP address';
+                errorMsg.classList.add('show');
+                return;
+            }
+
+            errorMsg.classList.remove('show');
+            btn.innerHTML = '<span class="spinner"></span> Discovering...';
+            btn.disabled = true;
+
+            currentResults = [];
+            allResults = [];
+            document.getElementById('hopTableBody').innerHTML = '';
+            document.getElementById('logContainer').innerHTML = '';
+            resetFilters();
+
+            startTime = Date.now();
+
+            addLog('🚀', `Starting MTU discovery to ${target}...`);
+            addLog('📡', `Auto-discovering maximum MTU (no limits)`);
+
+            if (isElectron) {
+                // Real Electron backend - results come via events
+                console.log('[RENDERER] Starting discovery...');
+                try {
+                    window.electronAPI.startDiscovery({target, protocol, maxMtu});
+                    // Note: We don't await here - results come via event listeners
+                } catch (error) {
+                    console.error('[RENDERER] Error starting discovery:', error);
+                    errorMsg.textContent = `❌ Error: ${error.message}`;
+                    errorMsg.classList.add('show');
+                    addLog('❌', `Error: ${error.message}`);
+                    btn.innerHTML = '🚀 Start Discovery';
+                    btn.disabled = false;
+                }
+            } else {
+                // Demo mode
+                await simulateDiscovery(target, protocol, maxMtu);
+                hideTestingProgress();
+                btn.innerHTML = '🚀 Start Discovery';
+                btn.disabled = false;
+                const duration = Math.round((Date.now() - startTime) / 1000);
+                document.getElementById('duration').textContent = `${duration}s`;
+            }
+        }
+
+        async function simulateDiscovery(target, protocol, maxMtu) {
+            const demoHops = [
+                { ip: '192.168.1.1', hostname: '192.168.1.1', pathMtu: 1500, hopCapacity: 1500 },
+                { ip: '10.0.0.1', hostname: '10.0.0.1', pathMtu: 1500, hopCapacity: 1500 },
+                { ip: '203.0.113.1', hostname: '203.0.113.1', pathMtu: 1500, hopCapacity: 1500 },
+                { ip: '198.51.100.1', hostname: '198.51.100.1', pathMtu: 1472, hopCapacity: 1500 },
+                { ip: '192.0.2.1', hostname: '192.0.2.1', pathMtu: 1472, hopCapacity: 1600 },
+                { ip: target, hostname: target, pathMtu: 1472, hopCapacity: 1500 }
+            ];
+
+            // Initialize empty graph
+            drawGraph([]);
+
+            for (let i = 0; i < demoHops.length; i++) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const hop = demoHops[i];
+                addLog('🔍', `Discovering hop ${i + 1}: ${hop.ip}`);
+                
+                // Show testing progress
+                showTestingProgress(i + 1, hop.ip, ['1500B', '1472B', '1450B']);
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                addLog('📊', `Testing Path MTU (DF=1): ${hop.pathMtu} bytes`);
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                addLog('📊', `Testing Hop Capacity (DF=0): ${hop.hopCapacity} bytes`);
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                addHopToTable(i + 1, hop);
+                drawGraph(demoHops.slice(0, i + 1));
+                updateStats(demoHops.slice(0, i + 1));
+            }
+
+            addLog('✅', 'Discovery complete!');
+        }
+
+        function addHopToTable(hopNumber, hopData) {
+            const tbody = document.getElementById('hopTableBody');
+            const row = document.createElement('tr');
+
+            // Check if hop is unreachable first
+            const isUnreachable = hopData.pathMtu === 0 || hopData.status === 'unreachable';
+
+            let pathClass, capClass, status, statusClass, statusIcon;
+
+            if (isUnreachable) {
+                pathClass = 'reduced';
+                capClass = 'reduced';
+                status = 'Unreachable';
+                statusClass = 'unreachable';
+                statusIcon = '❌';
+            } else {
+                pathClass = hopData.pathMtu >= 1500 ? 'optimal' : 'reduced';
+                capClass = hopData.hopCapacity >= 1500 ? 'optimal' : 'reduced';
+
+                if (hopData.pathMtu === hopData.hopCapacity) {
+                    if (hopData.pathMtu >= 1500) {
+                        status = 'Optimal';
+                        statusClass = 'optimal';
+                        statusIcon = '✅';
+                    } else {
+                        status = 'Reduced';
+                        statusClass = 'reduced';
+                        statusIcon = '⚠️';
+                    }
+                } else {
+                    status = 'Path Limited';
+                    statusClass = 'reduced';
+                    statusIcon = '⚠️';
+                }
+            }
+
+            row.setAttribute('data-path-mtu', hopData.pathMtu);
+            row.setAttribute('data-hop-capacity', hopData.hopCapacity);
+            row.setAttribute('data-status', statusClass);
+            
+            const pathMtuDisplay = isUnreachable ? 'N/A' : `${hopData.pathMtu} bytes`;
+            const hopCapDisplay = isUnreachable ? 'N/A' : `${hopData.hopCapacity} bytes`;
+            const pathBadgeClass = isUnreachable ? 'unreachable' : pathClass;
+            const capBadgeClass = isUnreachable ? 'unreachable' : capClass;
+
+            row.innerHTML = `
+                <td class="hop-number">#${hopNumber}</td>
+                <td class="hostname">${hopData.hostname}</td>
+                <td class="ip-address">${hopData.ip}</td>
+                <td><span class="mtu-badge ${pathBadgeClass}">${pathMtuDisplay}</span></td>
+                <td><span class="mtu-badge ${capBadgeClass}">${hopCapDisplay}</span></td>
+                <td><span class="status-badge ${statusClass}">${statusIcon} ${status}</span></td>
+            `;
+            
+            tbody.appendChild(row);
+            currentResults.push({ hop: hopNumber, ...hopData });
+            allResults.push({ hop: hopNumber, ...hopData });
+        }
+
+        function updateStats(hops) {
+            document.getElementById('totalHops').textContent = hops.length;
+
+            // Filter out unreachable hops for stats
+            const reachableHops = hops.filter(h => h.pathMtu > 0);
+
+            if (reachableHops.length === 0) {
+                document.getElementById('lowestMtu').textContent = 'N/A';
+                document.getElementById('lowestMtu').className = 'stat-value bad';
+                document.getElementById('bottleneck').textContent = 'All Unreachable';
+                return;
+            }
+
+            const minMtu = Math.min(...reachableHops.map(h => h.pathMtu));
+            document.getElementById('lowestMtu').textContent = `${minMtu} bytes`;
+            document.getElementById('lowestMtu').className = minMtu >= 1500 ? 'stat-value good' : (minMtu > 0 ? 'stat-value warning' : 'stat-value bad');
+
+            const bottleneckIndex = hops.findIndex(h => h.pathMtu === minMtu && h.pathMtu > 0);
+            document.getElementById('bottleneck').textContent = bottleneckIndex >= 0 ? `Hop #${bottleneckIndex + 1}` : 'None';
+        }
+
+        function exportCSV() {
+            if (allResults.length === 0) {
+                alert('No data to export. Please run a discovery first.');
+                return;
+            }
+            const csv = 'Hop,Hostname,IP,Path MTU,Hop Capacity,Status\n' +
+                allResults.map(r => `${r.hop},${r.hostname},${r.ip},${r.pathMtu},${r.hopCapacity},${r.pathMtu >= 1500 ? 'Optimal' : 'Reduced'}`).join('\n');
+            downloadFile(csv, 'mtu-discovery.csv', 'text/csv');
+        }
+
+        function exportJSON() {
+            if (allResults.length === 0) {
+                alert('No data to export. Please run a discovery first.');
+                return;
+            }
+            downloadFile(JSON.stringify(allResults, null, 2), 'mtu-discovery.json', 'application/json');
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        document.getElementById('helpModal').addEventListener('click', function(e) {
+            if (e.target === this) closeHelp();
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            initializeGraph();
+            if (allResults.length > 0) {
+                drawGraph(allResults);
+            }
+        });
+    </script>
+</body>
+</html>
