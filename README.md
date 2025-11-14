@@ -1,113 +1,131 @@
 # Ultimate Network Tool (UNT)
 
-A modular portable Windows networking tool for Windows 10/11 with LLDP/CDP discovery and VLAN probing capabilities.
+**Version:** 1.0.0
 
-## Features
+A professional network diagnostics tool for Windows 10/11 with LLDP/CDP discovery, VLAN probing, MTU testing, and ping monitoring.
 
-- **Admin Detection**: Visual indicator showing current privilege status (green/red)
-- **Network Adapter Management**: Select and view detailed adapter information (IP, subnet, MAC, gateway, DNS, DHCP)
-- **LLDP/CDP Discovery**: Passively listen for switch discovery frames to identify connected switches and ports
-- **VLAN Probing**: Detect tagged VLANs on network ports with safe, rate-limited probing
-- **Comprehensive Logging**: All actions, warnings, errors, and results are logged with timestamps
-- **Expandable Design**: Modular architecture ready for adding future networking tools
+## 🚀 Quick Start
 
-## Requirements
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
 
-- Windows 10 or Windows 11
-- Python 3.8 or higher
-- Administrator privileges (for packet capture and sending)
-- Npcap (Windows packet capture driver)
+# 2. Run as Administrator
+python app.py
 
-## Installation
-
-1. **Install Npcap**
-   - Download from: https://npcap.com/
-   - Install with WinPcap compatibility mode enabled
-
-2. **Install Python dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Usage
-
-1. **Run as Administrator** (required for packet capture)
-   ```bash
-   python unt_gui.py
-   ```
-
-2. **Select Network Adapter**
-   - Choose your network adapter from the dropdown (Ethernet is default)
-   - View adapter details in the information panel
-
-3. **Start Discovery**
-   - Click "Start Discovery" to passively listen for LLDP/CDP frames
-   - Switch information will appear in the results panel
-   - Click again to stop
-
-4. **Start VLAN Probe**
-   - Set VLAN range (default 1-100, max 1-4094)
-   - Click "Start VLAN Probe" to detect tagged VLANs
-   - Results show discovered VLANs from both passive discovery and active probing
-   - Click again to stop
-
-## Project Structure
-
-```
-UNT/
-├── unt_gui.py              # Main GUI application
-├── logger.py               # Logging system
-├── network_adapter.py      # Adapter management
-├── lldp_cdp_discovery.py   # LLDP/CDP discovery module
-├── vlan_probe.py           # VLAN probing module
-├── requirements.txt        # Python dependencies
-├── skills.md               # Technical skills documentation
-├── development_log.md      # Development progress log
-└── logs/                   # Application logs (created at runtime)
+# 3. Open browser
+http://localhost:5000
 ```
 
-## Safety Features
+## ✨ Key Features
 
-- **Rate Limiting**: VLAN probes are rate-limited (50ms delay between probes)
-- **Timeouts**: Each probe has a 200ms timeout
-- **Graceful Error Handling**: All exceptions are caught and logged
-- **Non-intrusive Probing**: Uses lightweight 802.1Q tagged frames
+- **🔍 LLDP/CDP Discovery** - Identify connected switches and ports
+- **📡 Active VLAN Probing** - Detect VLANs using DHCP discovery (ExtremeCloudIQ style)
+- **🧪 MTU Path Testing** - Discover maximum MTU for each hop
+- **📶 Ping Monitor** - Monitor availability and latency for multiple hosts
+- **🔄 IP Refresh** - Quick DHCP release/renew
+- **🖥️ Web + Desktop UI** - Modern web interface with optional Electron wrapper
 
-## Logging
+## 📋 Requirements
 
-All operations are logged to timestamped files in the `logs/` directory:
-- User actions
-- Network events (LLDP/CDP captures, VLAN probes)
-- Errors and warnings
-- Results with confidence levels
+- **Windows 10/11**
+- **Python 3.8+**
+- **Administrator privileges** (for packet capture)
+- **Npcap** - Download from https://npcap.com/
 
-## Future Expansion
+## 📚 Documentation
 
-The modular architecture allows easy addition of:
-- Port scanning modules
-- Bandwidth testing
-- Network diagnostics
-- Protocol analyzers
-- Additional discovery protocols
+**New to UNT?** → [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
 
-## Copyright
+| Document | Description |
+|----------|-------------|
+| [USER_GUIDE.md](docs/USER_GUIDE.md) | Complete user guide with examples |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design and architecture |
+| [API.md](docs/API.md) | REST and WebSocket API reference |
+| [OPTIMIZATION.md](docs/OPTIMIZATION.md) | Performance optimization guide |
+| [DEPLOYMENT.md](DEPLOYMENT.md) | Build and deployment instructions |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
 
-Copyright Digidots 2025
+## 🎯 Common Use Cases
 
-## Troubleshooting
+### Detect VLAN 300 on Your Port
+```
+1. Open http://localhost:5000
+2. Select adapter → Specific VLANs → Enter "1,300"
+3. Click "Scan"
+```
 
-**"Permission denied" errors**
-- Run as Administrator
-- Ensure Npcap is installed
+### Identify Connected Switch
+```
+1. Select adapter → Start Discovery
+2. Wait 15-60 seconds
+3. View switch name, port, model, IP
+```
 
-**"Scapy not available"**
-- Install scapy: `pip install scapy`
+### Diagnose MTU Issues
+```
+1. Navigate to MTU Test
+2. Enter target (e.g., vpn.company.com)
+3. View MTU for each hop
+```
 
-**No adapters found**
-- Check network adapter is enabled
-- Run `ipconfig /all` to verify adapters
+**More examples in [docs/USER_GUIDE.md](docs/USER_GUIDE.md)**
 
-**Discovery not working**
-- Ensure switch supports LLDP or CDP
-- Verify admin privileges
-- Check that Npcap is installed correctly
+## 🏗️ Project Structure
+
+```
+ultimate-network-tool/
+├── app.py                    # Flask web server (run this!)
+├── modules/                  # Core modules
+│   ├── discovery/           # LLDP/CDP and VLAN probing
+│   ├── mtu_tester/          # MTU discovery
+│   └── ping_monitor.py      # Ping monitoring
+├── templates/               # Web UI
+├── electron/                # Desktop wrapper
+├── docs/                    # Documentation
+└── requirements.txt         # Dependencies
+```
+
+## 🔒 Security & Safety
+
+- **Non-disruptive VLAN probing** - Sends DHCP Discover only (no lease consumption)
+- **Rate-limited** - 12 VLANs simultaneously, 5s timeout
+- **Localhost by default** - Binds to `0.0.0.0:5000` (configurable)
+- **Admin required** - For raw packet capture only
+
+## 🛠️ Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| "Permission denied" | Run Command Prompt as Administrator |
+| "Scapy not available" | `pip install scapy` |
+| No VLANs detected | Ensure DHCP server exists on VLAN |
+| Discovery not working | Check switch supports LLDP/CDP |
+
+**Full troubleshooting guide:** [docs/USER_GUIDE.md#troubleshooting](docs/USER_GUIDE.md#troubleshooting)
+
+## 🚢 Building for Distribution
+
+```bash
+# Build standalone executable
+npm run build
+
+# Output: release/Ultimate Network Tool Setup 1.0.0.exe
+```
+
+**See [DEPLOYMENT.md](DEPLOYMENT.md) for details**
+
+## 📄 License
+
+Copyright © Digidots 2025
+
+## 🤝 Contributing
+
+1. Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) to understand the design
+2. Check [docs/OPTIMIZATION.md](docs/OPTIMIZATION.md) for improvement opportunities
+3. Follow existing code style
+4. Test thoroughly before submitting
+
+---
+
+**Need help? Check [docs/USER_GUIDE.md](docs/USER_GUIDE.md) or create an issue!**
