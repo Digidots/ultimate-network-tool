@@ -783,6 +783,55 @@
             text-transform: capitalize;
         }
 
+        .tag-cell {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tag-cell:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .host-tag-display {
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.2);
+            color: #c084fc;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            text-transform: capitalize;
+            transition: all 0.2s ease;
+        }
+
+        .host-tag-display:hover {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .tag-placeholder {
+            color: #64748b;
+            font-size: 10px;
+            font-style: italic;
+        }
+
+        .tag-input {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            border-radius: 4px;
+            padding: 4px 8px;
+            color: #f1f5f9;
+            font-size: 11px;
+            width: 100px;
+            outline: none;
+        }
+
+        .tag-input:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
         .status-reachable {
             background: rgba(16, 185, 129, 0.2);
             color: #10b981;
@@ -832,15 +881,15 @@
             background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
             border: 1px solid rgba(59, 130, 246, 0.3);
             border-radius: 16px;
-            max-width: 1200px;
+            max-width: 1000px;
             width: 100%;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         .modal-header {
-            padding: 24px;
+            padding: 16px 20px;
             border-bottom: 1px solid rgba(148, 163, 184, 0.2);
             display: flex;
             justify-content: space-between;
@@ -848,7 +897,7 @@
         }
 
         .modal-title {
-            font-size: 20px;
+            font-size: 17px;
             font-weight: 700;
             background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
             -webkit-background-clip: text;
@@ -860,11 +909,11 @@
             background: rgba(239, 68, 68, 0.2);
             border: 1px solid rgba(239, 68, 68, 0.3);
             color: #ef4444;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -877,49 +926,49 @@
         }
 
         .modal-body {
-            padding: 24px;
+            padding: 20px;
         }
 
         .modal-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
         .modal-stat {
             background: rgba(59, 130, 246, 0.1);
             border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 8px 10px;
             text-align: center;
         }
 
         .modal-stat-label {
-            font-size: 10px;
+            font-size: 9px;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 4px;
+            letter-spacing: 0.6px;
+            margin-bottom: 3px;
         }
 
         .modal-stat-value {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 700;
             color: #60a5fa;
         }
 
         .ping-history {
-            max-height: 400px;
+            max-height: 300px;
             overflow-y: auto;
         }
 
         .ping-item {
             background: rgba(15, 23, 42, 0.4);
             border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 8px;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -971,8 +1020,8 @@
 
         .timeline-host-label {
             background: rgba(15, 23, 42, 0.8);
-            padding: 12px;
-            font-size: 12px;
+            padding: 6px 10px;
+            font-size: 11px;
             font-weight: 600;
             color: #cbd5e1;
             display: flex;
@@ -983,7 +1032,7 @@
         .timeline-row {
             background: rgba(15, 23, 42, 0.6);
             display: flex;
-            min-height: 40px;
+            min-height: 24px;
         }
 
         .timeline-cell {
@@ -1541,6 +1590,7 @@
                             <th style="width: 40px;">#</th>
                             <th onclick="sortTable('ip')">IP Address ▼</th>
                             <th onclick="sortTable('hostname')">Hostname ▼</th>
+                            <th onclick="sortTable('vendor')">Vendor ▼</th>
                             <th style="width: 120px;">Tag</th>
                             <th onclick="sortTable('status')">Status ▼</th>
                             <th onclick="sortTable('ping')">Avg Ping (ms) ▼</th>
@@ -1552,7 +1602,7 @@
                     </thead>
                     <tbody id="resultsBody">
                         <tr>
-                            <td colspan="10">
+                            <td colspan="11">
                                 <div class="empty-state">
                                     Enter IP addresses or ranges above and click "Start Ping" to begin monitoring
                                 </div>
@@ -1730,21 +1780,59 @@
             return Array.from(tags).sort();
         }
 
-        // Edit tag for a host
-        function editHostTag(ip) {
+        // Handle inline tag editing
+        document.addEventListener('click', function(e) {
+            const tagCell = e.target.closest('.tag-cell');
+            if (!tagCell) {
+                // Click outside - close any open tag inputs
+                document.querySelectorAll('.tag-input').forEach(input => {
+                    const ip = input.dataset.ip;
+                    const tag = getHostTag(ip);
+                    const parent = input.parentElement;
+                    parent.innerHTML = tag ?
+                        `<span class="host-tag-display">${tag}</span>` :
+                        '<span class="tag-placeholder">add tag</span>';
+                });
+                return;
+            }
+
+            // Check if already editing
+            if (tagCell.querySelector('.tag-input')) return;
+
+            const ip = tagCell.dataset.ip;
             const currentTag = getHostTag(ip);
-            const existingTags = getAllTags();
 
-            let message = `Enter tag for ${ip}:`;
-            if (existingTags.length > 0) {
-                message += `\n\nExisting tags: ${existingTags.join(', ')}`;
-            }
+            // Create input
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'tag-input';
+            input.value = currentTag || '';
+            input.placeholder = 'enter tag';
+            input.dataset.ip = ip;
 
-            const newTag = prompt(message, currentTag);
-            if (newTag !== null) {
+            // Replace content with input
+            tagCell.innerHTML = '';
+            tagCell.appendChild(input);
+            input.focus();
+            input.select();
+
+            // Handle save on Enter or blur
+            const saveTag = () => {
+                const newTag = input.value.trim();
                 setHostTag(ip, newTag);
-            }
-        }
+                renderTableView(); // Re-render to show updated tag
+            };
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    saveTag();
+                } else if (e.key === 'Escape') {
+                    renderTableView(); // Cancel
+                }
+            });
+
+            input.addEventListener('blur', saveTag);
+        });
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -2009,18 +2097,19 @@
                 const avgPing = r.avg_ping_ms !== null ? r.avg_ping_ms.toFixed(1) : 'N/A';
                 const lastUpdate = new Date(r.last_update).toLocaleTimeString();
                 const currentTag = getHostTag(r.ip);
-                const tagDisplay = currentTag ?
-                    `<span class="host-tag">${currentTag}</span>` :
-                    `<span style="color: #64748b; font-size: 9px;">no tag</span>`;
+                const vendor = r.vendor || 'Unknown';
+                const vendorDisplay = vendor !== 'Unknown' ?
+                    `<span style="color: #94a3b8; font-size: 11px;">${vendor}</span>` :
+                    `<span style="color: #64748b; font-size: 10px;">-</span>`;
 
                 return `
                     <tr onclick="showHostDetail('${r.ip}')">
                         <td style="color: #64748b; font-weight: 600;">${index + 1}</td>
                         <td>${r.ip}</td>
                         <td>${r.hostname || 'N/A'}</td>
-                        <td onclick="event.stopPropagation(); editHostTag('${r.ip}')" style="cursor: pointer;">
-                            ${tagDisplay}
-                            <span style="color: #60a5fa; font-size: 10px; margin-left: 4px;">✎</span>
+                        <td>${vendorDisplay}</td>
+                        <td onclick="event.stopPropagation();" class="tag-cell" data-ip="${r.ip}">
+                            ${currentTag ? `<span class="host-tag-display">${currentTag}</span>` : '<span class="tag-placeholder">add tag</span>'}
                         </td>
                         <td><span class="status-badge ${statusClass}">${r.status}</span></td>
                         <td>${avgPing}</td>
