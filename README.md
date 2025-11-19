@@ -1,6 +1,6 @@
 # Ultimate Network Tool (UNT)
 
-**Version 3.0.0**
+**Version 3.1.0**
 
 A comprehensive network diagnostics tool with web-based interface for Windows 10/11, featuring active DHCP-based VLAN probing, LLDP/CDP discovery, and more.
 

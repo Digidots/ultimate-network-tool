@@ -1,6 +1,31 @@
 # Ultimate Network Tool - Version History
 
-## Current Version: 3.0.0
+## Current Version: 3.1.0
+
+---
+
+## Version 3.1.0 (2025-11-19)
+
+### Ping Monitor Enhancements
+- **Network Event Viewer** - NEW dedicated Events view in Ping Monitor
+  - Automatically detects when 3+ hosts fail simultaneously for 3+ consecutive pings
+  - Event classification: 🔴 Network Outages (50%+ hosts), 🟠 Partial Outages (20-49%), 🟡 Host Group Failures (3-19%)
+  - Event timeline with timestamps and affected host lists
+  - Filterable event view (All Events, Network Outages, Partial Outages, Group Failures)
+  - Event statistics dashboard showing total events by type
+- **Unlimited Ping History** - Removed 1000-ping limit, now stores complete history
+- **Improved Results Display** - Compact table with smaller fonts and tighter spacing
+  - Reduced font sizes (11px table, 9px headers)
+  - Reduced padding (6px vs 8px)
+  - Better readability with lots of hosts
+- **Removed Heatmap View** - Replaced with Events view for better usability
+
+### Technical Improvements
+- Added `detectNetworkEvent()` function with intelligent failure tracking
+- Tracks consecutive failures per host with `hostFailureTracking` Map
+- Real-time event detection on each ping update
+- Duplicate event prevention logic
+- Events data structure includes type, timestamp, affected hosts, and percentages
 
 ---
 
