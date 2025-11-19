@@ -1084,8 +1084,20 @@ def get_mac_from_arp(ip: str) -> Optional[str]:
                             mac = mac_match.group(0).replace('-', ':').upper()
                             return mac
         else:
-            # Linux/Unix
-            result = subprocess.run(['arp', '-n', ip], capture_output=True, text=True, timeout=2)
+            # Linux/Unix - try ip neigh first (more modern), then fall back to arp
+            try:
+                # Try ip neigh show command first
+                result = subprocess.run(['ip', 'neigh', 'show', ip], capture_output=True, text=True, timeout=2)
+                if result.returncode == 0 and result.stdout.strip():
+                    # Expected format: "192.168.1.1 dev eth0 lladdr aa:bb:cc:dd:ee:ff REACHABLE"
+                    mac_match = re.search(r'([0-9a-f]{2}:){5}[0-9a-f]{2}', result.stdout, re.IGNORECASE)
+                    if mac_match:
+                        return mac_match.group(0).upper()
+            except FileNotFoundError:
+                pass  # ip command not found, fall back to arp
+
+            # Fall back to arp -n
+            result = subprocess.run(['arp', '-n'], capture_output=True, text=True, timeout=2)
             if result.returncode == 0:
                 for line in result.stdout.splitlines():
                     if ip in line:
@@ -1364,7 +1376,15 @@ class PingMonitor:
                 result.consecutive_failures = 0
 
                 # Get MAC address and vendor for reachable hosts
-                if not result.mac_address:  # Only lookup once
+                # Check if we already have it from a previous ping
+                existing_mac = None
+                if ip in self.results and self.results[ip].mac_address:
+                    existing_mac = self.results[ip].mac_address
+                    result.mac_address = existing_mac
+                    result.vendor = self.results[ip].vendor
+                elif not result.mac_address:  # Only lookup if we don't have it yet
+                    # Small delay to let ARP table populate
+                    time.sleep(0.05)
                     result.mac_address = get_mac_from_arp(ip)
                     if result.mac_address:
                         result.vendor = get_vendor_from_mac(result.mac_address)

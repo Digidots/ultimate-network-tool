@@ -713,6 +713,60 @@
             color: white;
         }
 
+        /* Column Menu Styles */
+        .column-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            min-width: 200px;
+            padding: 8px 0;
+        }
+
+        .column-menu-header {
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            border-bottom: 1px solid #334155;
+            margin-bottom: 4px;
+        }
+
+        .column-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .column-menu-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .column-menu-item input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .column-menu-item span {
+            font-size: 13px;
+            color: #e2e8f0;
+        }
+
+        /* Hide columns when toggled */
+        th[data-column].hidden,
+        td[data-column].hidden {
+            display: none !important;
+        }
+
         .results-table-container {
             overflow-x: auto;
             border-radius: 10px;
@@ -1579,6 +1633,51 @@
                         <button class="filter-btn" onclick="filterResults('reachable')">Reachable Only</button>
                         <button class="filter-btn" onclick="filterResults('unreachable')">Unreachable Only</button>
                     </div>
+                    <!-- Column Selector -->
+                    <div style="position: relative; display: inline-block; margin-left: 15px;">
+                        <button class="filter-btn" onclick="toggleColumnMenu(event)" style="background: #1e293b; border: 1px solid #334155;">
+                            ⚙ Columns
+                        </button>
+                        <div id="columnMenu" class="column-menu" style="display: none;">
+                            <div class="column-menu-header">Show/Hide Columns</div>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('hostname', this.checked)">
+                                <span>Hostname</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('vendor', this.checked)">
+                                <span>Vendor</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('tag', this.checked)">
+                                <span>Tag</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('avg-ping', this.checked)">
+                                <span>Avg Ping (ms)</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('packets', this.checked)">
+                                <span>Packets (Sent/Rcv)</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('loss', this.checked)">
+                                <span>Loss %</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('success-fail', this.checked)">
+                                <span>Success/Fail</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('ttl', this.checked)">
+                                <span>TTL</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('last-update', this.checked)">
+                                <span>Last Update</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1589,16 +1688,16 @@
                         <tr>
                             <th style="width: 40px;">#</th>
                             <th onclick="sortTable('ip')">IP Address ▼</th>
-                            <th onclick="sortTable('hostname')">Hostname ▼</th>
-                            <th onclick="sortTable('vendor')">Vendor ▼</th>
-                            <th style="width: 120px;">Tag</th>
+                            <th data-column="hostname" onclick="sortTable('hostname')">Hostname ▼</th>
+                            <th data-column="vendor" onclick="sortTable('vendor')">Vendor ▼</th>
+                            <th data-column="tag" style="width: 120px;">Tag</th>
                             <th onclick="sortTable('status')">Status ▼</th>
-                            <th onclick="sortTable('ping')">Avg Ping (ms) ▼</th>
-                            <th onclick="sortTable('packets')">Packets (Sent/Rcv) ▼</th>
-                            <th onclick="sortTable('loss')">Loss % ▼</th>
-                            <th onclick="sortTable('success')">Success/Fail ▼</th>
-                            <th onclick="sortTable('ttl')">TTL ▼</th>
-                            <th onclick="sortTable('lastUpdate')">Last Update ▼</th>
+                            <th data-column="avg-ping" onclick="sortTable('ping')">Avg Ping (ms) ▼</th>
+                            <th data-column="packets" onclick="sortTable('packets')">Packets (Sent/Rcv) ▼</th>
+                            <th data-column="loss" onclick="sortTable('loss')">Loss % ▼</th>
+                            <th data-column="success-fail" onclick="sortTable('success')">Success/Fail ▼</th>
+                            <th data-column="ttl" onclick="sortTable('ttl')">TTL ▼</th>
+                            <th data-column="last-update" onclick="sortTable('lastUpdate')">Last Update ▼</th>
                         </tr>
                     </thead>
                     <tbody id="resultsBody">
@@ -1843,6 +1942,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             loadTags();
+            loadColumnPreferences();
             connectWebSocket();
             checkStatus();
         });
@@ -2130,18 +2230,18 @@
                     <tr onclick="showHostDetail('${r.ip}')">
                         <td style="color: #64748b; font-weight: 600;">${index + 1}</td>
                         <td>${r.ip}</td>
-                        <td>${r.hostname || 'N/A'}</td>
-                        <td>${vendorDisplay}</td>
-                        <td onclick="event.stopPropagation();" class="tag-cell" data-ip="${r.ip}">
+                        <td data-column="hostname">${r.hostname || 'N/A'}</td>
+                        <td data-column="vendor">${vendorDisplay}</td>
+                        <td data-column="tag" onclick="event.stopPropagation();" class="tag-cell" data-ip="${r.ip}">
                             ${currentTag ? `<span class="host-tag-display">${currentTag}</span>` : '<span class="tag-placeholder">add tag</span>'}
                         </td>
                         <td><span class="status-badge ${statusClass}">${r.status}</span></td>
-                        <td>${avgPing}</td>
-                        <td>${r.packets_sent}/${r.packets_received}</td>
-                        <td>${r.packet_loss_percent.toFixed(0)}%</td>
-                        <td><span style="color: #10b981; font-weight: 600;">${successCount}</span> / <span style="color: #ef4444; font-weight: 600;">${failureCount}</span></td>
-                        <td>${r.ttl || 'N/A'}</td>
-                        <td>${lastUpdate}</td>
+                        <td data-column="avg-ping">${avgPing}</td>
+                        <td data-column="packets">${r.packets_sent}/${r.packets_received}</td>
+                        <td data-column="loss">${r.packet_loss_percent.toFixed(0)}%</td>
+                        <td data-column="success-fail"><span style="color: #10b981; font-weight: 600;">${successCount}</span> / <span style="color: #ef4444; font-weight: 600;">${failureCount}</span></td>
+                        <td data-column="ttl">${r.ttl || 'N/A'}</td>
+                        <td data-column="last-update">${lastUpdate}</td>
                     </tr>
                 `;
             }).join('');
@@ -2675,6 +2775,63 @@
             event.target.classList.add('active');
 
             renderCurrentView();
+        }
+
+        // Column selector menu functions
+        function toggleColumnMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('columnMenu');
+            const isVisible = menu.style.display === 'block';
+            menu.style.display = isVisible ? 'none' : 'block';
+        }
+
+        function toggleColumn(columnName, show) {
+            // Toggle header
+            const headers = document.querySelectorAll(`th[data-column="${columnName}"]`);
+            headers.forEach(th => {
+                if (show) {
+                    th.classList.remove('hidden');
+                } else {
+                    th.classList.add('hidden');
+                }
+            });
+
+            // Toggle cells
+            const cells = document.querySelectorAll(`td[data-column="${columnName}"]`);
+            cells.forEach(td => {
+                if (show) {
+                    td.classList.remove('hidden');
+                } else {
+                    td.classList.add('hidden');
+                }
+            });
+
+            // Save preferences to localStorage
+            const columnPrefs = JSON.parse(localStorage.getItem('pingColumnPrefs') || '{}');
+            columnPrefs[columnName] = show;
+            localStorage.setItem('pingColumnPrefs', JSON.stringify(columnPrefs));
+        }
+
+        // Close column menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('columnMenu');
+            if (menu && !event.target.closest('#columnMenu') && !event.target.closest('[onclick*="toggleColumnMenu"]')) {
+                menu.style.display = 'none';
+            }
+        });
+
+        // Load column preferences on page load
+        function loadColumnPreferences() {
+            const columnPrefs = JSON.parse(localStorage.getItem('pingColumnPrefs') || '{}');
+            Object.keys(columnPrefs).forEach(columnName => {
+                const show = columnPrefs[columnName];
+                toggleColumn(columnName, show);
+                // Update checkbox state
+                const checkbox = document.querySelector(`input[onchange*="toggleColumn('${columnName}'"]`);
+                if (checkbox) {
+                    checkbox.checked = show;
+                }
+            });
         }
 
         // Sort table
