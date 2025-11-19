@@ -185,7 +185,8 @@
             justify-content: space-between;
             align-items: center;
             position: relative;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(59, 130, 246, 0.1);
+            backdrop-filter: blur(10px);
         }
 
         .header::before {
@@ -240,25 +241,34 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(148, 163, 184, 0.15);
             border-radius: 16px;
-            padding: 24px;
+            padding: 28px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 0 1px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .calculator-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(59, 130, 246, 0.1);
         }
 
         .section-title {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 700;
             color: #f1f5f9;
-            margin-bottom: 16px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            letter-spacing: -0.5px;
+            line-height: 1.3;
         }
 
         .section-subtitle {
-            font-size: 12px;
+            font-size: 13px;
             color: #94a3b8;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            line-height: 1.5;
         }
 
         .input-group {
@@ -269,8 +279,9 @@
             display: block;
             font-size: 13px;
             color: #cbd5e1;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
+            letter-spacing: 0.3px;
         }
 
         .input-field {
@@ -291,7 +302,7 @@
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 12px 24px;
             background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             border: none;
             border-radius: 8px;
@@ -301,11 +312,33 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
         }
 
         .btn-secondary {
@@ -316,20 +349,21 @@
         .preset-buttons {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
             margin-top: 12px;
         }
 
         .preset-btn {
-            padding: 8px 16px;
+            padding: 6px 10px;
             background: rgba(59, 130, 246, 0.1);
             border: 1px solid rgba(59, 130, 246, 0.3);
             border-radius: 6px;
             color: #60a5fa;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .preset-btn:hover {
@@ -348,22 +382,33 @@
             background: rgba(30, 41, 59, 0.5);
             border: 1px solid rgba(148, 163, 184, 0.1);
             border-radius: 12px;
-            padding: 16px;
+            padding: 18px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .result-card:hover {
+            background: rgba(30, 41, 59, 0.65);
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .result-label {
             font-size: 11px;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+            font-weight: 600;
         }
 
         .result-value {
-            font-size: 16px;
+            font-size: 15px;
             color: #f1f5f9;
             font-weight: 600;
             font-family: 'Courier New', monospace;
+            line-height: 1.4;
         }
 
         .private-ip-badge {
@@ -392,35 +437,6 @@
             margin-bottom: 8px;
             font-family: 'Courier New', monospace;
             font-size: 13px;
-        }
-
-        .subnet-visual {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 12px;
-        }
-
-        .subnet-bar {
-            height: 40px;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .subnet-segment {
-            position: absolute;
-            top: 0;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 11px;
-            font-weight: 600;
-            border-right: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         .two-column {
@@ -672,7 +688,10 @@
         <div class="two-column">
             <!-- IP IN SUBNET CHECKER -->
             <div class="calculator-section">
-                <div class="section-title">🔍 IP in Subnet Checker</div>
+                <div class="section-title">
+                    🔍 IP in Subnet Checker
+                    <span class="info-icon" data-tooltip="Verify if a specific IP address falls within a given subnet range. Useful for troubleshooting network connectivity.">ℹ</span>
+                </div>
                 <div class="section-subtitle">Check if an IP belongs to a subnet</div>
 
                 <div class="input-group">
@@ -692,7 +711,10 @@
 
             <!-- SUBNET SPLITTER -->
             <div class="calculator-section">
-                <div class="section-title">✂️ Subnet Splitter</div>
+                <div class="section-title">
+                    ✂️ Subnet Splitter
+                    <span class="info-icon" data-tooltip="Divide a larger subnet into multiple smaller subnets of equal size. Calculates new CIDR and usable ranges automatically.">ℹ</span>
+                </div>
                 <div class="section-subtitle">Split a subnet into smaller subnets</div>
 
                 <div class="input-group">
@@ -713,7 +735,10 @@
 
         <!-- SUPERNET CALCULATOR -->
         <div class="calculator-section">
-            <div class="section-title">⬆️ Supernet Calculator</div>
+            <div class="section-title">
+                ⬆️ Supernet Calculator
+                <span class="info-icon" data-tooltip="Combine multiple contiguous subnets into a single larger supernet (route summarization). Useful for reducing routing table entries.">ℹ</span>
+            </div>
             <div class="section-subtitle">Combine multiple adjacent subnets into a supernet</div>
 
             <div class="input-group">
@@ -728,7 +753,10 @@
 
         <!-- VLSM HELPER -->
         <div class="calculator-section">
-            <div class="section-title">🎯 VLSM Helper</div>
+            <div class="section-title">
+                🎯 VLSM Helper
+                <span class="info-icon" data-tooltip="Variable Length Subnet Masking allocates optimal subnet sizes based on actual host requirements. Minimizes IP waste by using different CIDR sizes.">ℹ</span>
+            </div>
             <div class="section-subtitle">Variable Length Subnet Masking - optimal subnet allocation</div>
 
             <div class="input-group">
@@ -752,21 +780,12 @@
             <div id="vlsmResults" class="subnet-list"></div>
         </div>
 
-        <!-- VISUAL SUBNET MAP -->
-        <div class="calculator-section">
-            <div class="section-title">🗺️ Visual Subnet Map</div>
-            <div class="section-subtitle">Graphical representation of subnet division</div>
-
-            <div id="visualMap" class="subnet-visual">
-                <div style="text-align: center; color: #94a3b8; padding: 40px;">
-                    Enter a subnet above and click Calculate to see the visual map
-                </div>
-            </div>
-        </div>
-
         <!-- IPv6 SECTION -->
         <div class="calculator-section">
-            <div class="section-title">🌐 IPv6 Calculator</div>
+            <div class="section-title">
+                🌐 IPv6 Calculator
+                <span class="info-icon" data-tooltip="Calculate IPv6 subnet information including expanded addresses, prefix lengths, and available subnets. IPv6 uses 128-bit addresses.">ℹ</span>
+            </div>
             <div class="section-subtitle">Calculate IPv6 subnet information</div>
 
             <div class="input-group">
@@ -886,8 +905,9 @@
             const input = document.getElementById('ipInput').value.trim();
             const [ip, cidr] = input.split('/');
 
+            // Silent validation - just hide results if invalid
             if (!ip || !cidr || cidr < 0 || cidr > 32) {
-                alert('Please enter a valid IP/CIDR (e.g., 192.168.1.0/24)');
+                document.getElementById('results').style.display = 'none';
                 return;
             }
 
@@ -955,9 +975,6 @@
                 </div>
             `;
             document.getElementById('results').style.display = 'grid';
-
-            // Update visual map
-            updateVisualMap(networkIp, cidrNum);
         }
 
         function setPreset(cidr) {
@@ -1180,37 +1197,6 @@
             });
 
             document.getElementById('vlsmResults').innerHTML = html;
-        }
-
-        // ===== VISUAL SUBNET MAP =====
-
-        function updateVisualMap(networkIp, cidr) {
-            const totalBits = 32 - cidr;
-            const segments = Math.min(8, Math.max(2, Math.ceil(totalBits / 2)));
-
-            let html = `
-                <div style="margin-bottom: 16px; color: #cbd5e1;">
-                    <strong>Network:</strong> ${networkIp}/${cidr} |
-                    <strong>Segments:</strong> ${2 ** totalBits} |
-                    <strong>Host bits:</strong> ${totalBits}
-                </div>
-                <div class="subnet-bar">
-            `;
-
-            const segmentWidth = 100 / segments;
-            const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#6366f1', '#a855f7'];
-
-            for (let i = 0; i < segments; i++) {
-                html += `
-                    <div class="subnet-segment" style="left: ${i * segmentWidth}%; width: ${segmentWidth}%; background: ${colors[i % colors.length]};">
-                        ${i + 1}
-                    </div>
-                `;
-            }
-
-            html += '</div>';
-
-            document.getElementById('visualMap').innerHTML = html;
         }
 
         // ===== IPv6 CALCULATOR =====
