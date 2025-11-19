@@ -188,10 +188,21 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
+        .header::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100px;
+            width: 100%;
+            pointer-events: none;
+        }
+
         .title-section {
             display: flex;
             align-items: center;
             gap: 16px;
+            margin-left: 80px;
         }
 
         .brand-icon {
@@ -444,6 +455,70 @@
             margin-top: 20px;
         }
 
+        .info-icon {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            background: rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 10px;
+            line-height: 14px;
+            font-weight: bold;
+            cursor: help;
+            margin-left: 6px;
+            position: relative;
+        }
+
+        .info-icon:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 125%;
+            background: rgba(15, 23, 42, 0.95);
+            color: #cbd5e1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            font-size: 11px;
+            line-height: 1.4;
+            white-space: nowrap;
+            max-width: 300px;
+            white-space: normal;
+            width: max-content;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            font-weight: normal;
+        }
+
+        .info-icon:hover::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 115%;
+            border: 5px solid transparent;
+            border-top-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .input-with-convert {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-with-convert .input-field {
+            flex: 1;
+        }
+
+        .convert-arrow {
+            color: #60a5fa;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
             .two-column {
                 grid-template-columns: 1fr;
@@ -542,15 +617,45 @@
 
         <!-- MAIN CALCULATOR -->
         <div class="calculator-section">
-            <div class="section-title">📊 IP/CIDR Calculator</div>
-            <div class="section-subtitle">Enter an IP address with CIDR notation to calculate subnet information</div>
+            <div class="section-title">
+                📊 IP/CIDR Calculator
+                <span class="info-icon" data-tooltip="Enter an IP with CIDR (e.g., 192.168.1.0/24) or use a subnet mask below. Calculates network, broadcast, and usable IP range automatically.">ℹ</span>
+            </div>
+            <div class="section-subtitle">Enter an IP address with CIDR notation - calculations update automatically</div>
 
             <div class="input-group">
-                <label class="input-label">IP Address / CIDR</label>
-                <input type="text" id="ipInput" class="input-field" placeholder="192.168.1.0/24" value="192.168.1.0/24">
+                <label class="input-label">
+                    IP Address / CIDR
+                    <span class="info-icon" data-tooltip="CIDR notation combines IP and prefix length. Example: 192.168.1.0/24 means the first 24 bits are the network portion.">ℹ</span>
+                </label>
+                <input type="text" id="ipInput" class="input-field" placeholder="192.168.1.0/24" value="192.168.1.0/24" oninput="calculate()">
             </div>
 
+            <div class="input-group">
+                <label class="input-label">
+                    Or Enter Subnet Mask → CIDR Converter
+                    <span class="info-icon" data-tooltip="Convert dotted decimal subnet mask (e.g., 255.255.255.0) to CIDR notation (/24). Useful for learning subnet mask to CIDR conversion.">ℹ</span>
+                </label>
+                <div class="input-with-convert">
+                    <input type="text" id="maskInput" class="input-field" placeholder="255.255.255.0" oninput="convertMaskToCIDR()">
+                    <span class="convert-arrow">→</span>
+                    <input type="text" id="cidrOutput" class="input-field" placeholder="/24" readonly style="max-width: 100px; background: rgba(15, 23, 42, 0.4);">
+                </div>
+            </div>
+
+            <div style="margin-top: 16px; margin-bottom: 8px;">
+                <label class="input-label">
+                    Quick Presets
+                    <span class="info-icon" data-tooltip="Common subnet sizes. Larger numbers = smaller subnets. /24 = 256 addresses, /30 = 4 addresses (useful for point-to-point links).">ℹ</span>
+                </label>
+            </div>
             <div class="preset-buttons">
+                <button class="preset-btn" onclick="setPreset('/18')">/18 - 16,384 hosts</button>
+                <button class="preset-btn" onclick="setPreset('/19')">/19 - 8,192 hosts</button>
+                <button class="preset-btn" onclick="setPreset('/20')">/20 - 4,096 hosts</button>
+                <button class="preset-btn" onclick="setPreset('/21')">/21 - 2,048 hosts</button>
+                <button class="preset-btn" onclick="setPreset('/22')">/22 - 1,024 hosts</button>
+                <button class="preset-btn" onclick="setPreset('/23')">/23 - 512 hosts</button>
                 <button class="preset-btn" onclick="setPreset('/24')">/24 - 256 hosts</button>
                 <button class="preset-btn" onclick="setPreset('/25')">/25 - 128 hosts</button>
                 <button class="preset-btn" onclick="setPreset('/26')">/26 - 64 hosts</button>
@@ -559,8 +664,6 @@
                 <button class="preset-btn" onclick="setPreset('/29')">/29 - 8 hosts</button>
                 <button class="preset-btn" onclick="setPreset('/30')">/30 - 4 hosts</button>
             </div>
-
-            <button class="btn" style="margin-top: 16px;" onclick="calculate()">Calculate</button>
 
             <div id="results" class="result-grid" style="display: none;"></div>
         </div>
@@ -706,6 +809,75 @@
             // 192.168.0.0/16
             if (ipInt >= ipToInt('192.168.0.0') && ipInt <= ipToInt('192.168.255.255')) return true;
             return false;
+        }
+
+        // ===== SUBNET MASK TO CIDR CONVERTER =====
+
+        function convertMaskToCIDR() {
+            const mask = document.getElementById('maskInput').value.trim();
+            const cidrOutputField = document.getElementById('cidrOutput');
+
+            // Clear output if input is empty
+            if (!mask) {
+                cidrOutputField.value = '';
+                return;
+            }
+
+            try {
+                // Validate format (must be x.x.x.x)
+                const octets = mask.split('.');
+                if (octets.length !== 4) {
+                    cidrOutputField.value = 'Invalid';
+                    return;
+                }
+
+                // Validate each octet is 0-255
+                for (let octet of octets) {
+                    const num = parseInt(octet);
+                    if (isNaN(num) || num < 0 || num > 255) {
+                        cidrOutputField.value = 'Invalid';
+                        return;
+                    }
+                }
+
+                // Convert mask to integer and count consecutive 1 bits from left
+                const maskInt = ipToInt(mask);
+                let cidr = 0;
+                let foundZero = false;
+
+                for (let i = 31; i >= 0; i--) {
+                    if (maskInt & (1 << i)) {
+                        if (foundZero) {
+                            // Invalid mask: has 1s after 0s
+                            cidrOutputField.value = 'Invalid';
+                            return;
+                        }
+                        cidr++;
+                    } else {
+                        foundZero = true;
+                    }
+                }
+
+                // Display result
+                cidrOutputField.value = '/' + cidr;
+
+                // Optionally update main input if there's already an IP
+                const currentInput = document.getElementById('ipInput').value.trim();
+                if (currentInput) {
+                    const currentIp = currentInput.split('/')[0];
+                    // Check if it looks like a valid IP
+                    if (currentIp.match(/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/)) {
+                        document.getElementById('ipInput').value = currentIp + '/' + cidr;
+                        calculate(); // Auto-calculate with new CIDR
+                    }
+                } else {
+                    // If no IP in main input, suggest a default
+                    document.getElementById('ipInput').value = '192.168.1.0/' + cidr;
+                    calculate();
+                }
+            } catch (error) {
+                cidrOutputField.value = 'Invalid';
+            }
         }
 
         // ===== MAIN CALCULATOR =====
