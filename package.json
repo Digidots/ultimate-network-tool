@@ -1,6 +1,6 @@
 {
   "name": "ultimate-network-tool",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "description": "Ultimate Network Tool - Network diagnostics with LLDP/CDP discovery, VLAN probing, MTU testing, and ping monitoring",
   "main": "electron/main.js",
   "author": "Digidots",

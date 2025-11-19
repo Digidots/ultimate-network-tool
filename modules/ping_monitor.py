@@ -1068,11 +1068,61 @@ MAC_VENDORS = {
 }
 
 
-def get_mac_from_arp(ip: str) -> Optional[str]:
-    """Get MAC address from ARP table for given IP"""
+def get_arp_table() -> Dict[str, str]:
+    """
+    Get entire ARP table at once for better performance
+    Returns dict mapping IP -> MAC address
+    """
+    arp_table = {}
     try:
         if platform.system() == 'Windows':
-            result = subprocess.run(['arp', '-a', ip], capture_output=True, text=True, timeout=2)
+            result = subprocess.run(['arp', '-a'], capture_output=True, text=True, timeout=1)
+            if result.returncode == 0:
+                for line in result.stdout.splitlines():
+                    # Extract both IP and MAC from each line
+                    ip_match = re.search(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', line)
+                    mac_match = re.search(r'([0-9a-f]{2}[-:]){5}[0-9a-f]{2}', line, re.IGNORECASE)
+                    if ip_match and mac_match:
+                        ip = ip_match.group(0)
+                        mac = mac_match.group(0).replace('-', ':').upper()
+                        arp_table[ip] = mac
+        else:
+            # Linux/Unix - try ip neigh first (more modern)
+            try:
+                result = subprocess.run(['ip', 'neigh'], capture_output=True, text=True, timeout=1)
+                if result.returncode == 0:
+                    for line in result.stdout.splitlines():
+                        # Expected format: "192.168.1.1 dev eth0 lladdr aa:bb:cc:dd:ee:ff REACHABLE"
+                        ip_match = re.search(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', line)
+                        mac_match = re.search(r'([0-9a-f]{2}:){5}[0-9a-f]{2}', line, re.IGNORECASE)
+                        if ip_match and mac_match:
+                            ip = ip_match.group(0)
+                            mac = mac_match.group(0).upper()
+                            arp_table[ip] = mac
+            except FileNotFoundError:
+                pass  # ip command not found, fall back to arp
+
+            # Fall back to arp -n if ip command not available or returned nothing
+            if not arp_table:
+                result = subprocess.run(['arp', '-n'], capture_output=True, text=True, timeout=1)
+                if result.returncode == 0:
+                    for line in result.stdout.splitlines():
+                        ip_match = re.search(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b', line)
+                        mac_match = re.search(r'([0-9a-f]{2}:){5}[0-9a-f]{2}', line, re.IGNORECASE)
+                        if ip_match and mac_match:
+                            ip = ip_match.group(0)
+                            mac = mac_match.group(0).upper()
+                            arp_table[ip] = mac
+    except Exception:
+        pass
+    return arp_table
+
+
+def get_mac_from_arp(ip: str) -> Optional[str]:
+    """Get MAC address from ARP table for given IP (legacy single lookup)"""
+    try:
+        if platform.system() == 'Windows':
+            result = subprocess.run(['arp', '-a', ip], capture_output=True, text=True, timeout=1)
             if result.returncode == 0:
                 # Parse Windows ARP output
                 # Expected format: "  192.168.1.1           aa-bb-cc-dd-ee-ff     dynamic"
@@ -1087,7 +1137,7 @@ def get_mac_from_arp(ip: str) -> Optional[str]:
             # Linux/Unix - try ip neigh first (more modern), then fall back to arp
             try:
                 # Try ip neigh show command first
-                result = subprocess.run(['ip', 'neigh', 'show', ip], capture_output=True, text=True, timeout=2)
+                result = subprocess.run(['ip', 'neigh', 'show', ip], capture_output=True, text=True, timeout=1)
                 if result.returncode == 0 and result.stdout.strip():
                     # Expected format: "192.168.1.1 dev eth0 lladdr aa:bb:cc:dd:ee:ff REACHABLE"
                     mac_match = re.search(r'([0-9a-f]{2}:){5}[0-9a-f]{2}', result.stdout, re.IGNORECASE)
@@ -1097,7 +1147,7 @@ def get_mac_from_arp(ip: str) -> Optional[str]:
                 pass  # ip command not found, fall back to arp
 
             # Fall back to arp -n
-            result = subprocess.run(['arp', '-n'], capture_output=True, text=True, timeout=2)
+            result = subprocess.run(['arp', '-n'], capture_output=True, text=True, timeout=1)
             if result.returncode == 0:
                 for line in result.stdout.splitlines():
                     if ip in line:
@@ -1164,6 +1214,28 @@ class PingMonitor:
         self.interval = 5  # Interval between ping rounds (if continuous)
         self.max_concurrent_pings = 50  # Limit concurrent pings
         self.resolve_hostnames = True
+
+        # Performance optimizations
+        self.arp_cache: Dict[str, str] = {}  # Cached ARP table
+        self.arp_cache_time = 0  # Last time ARP cache was updated
+        self.arp_cache_ttl = 10  # Refresh ARP cache every 10 seconds
+
+    def _refresh_arp_cache(self):
+        """Refresh ARP cache if it's stale"""
+        current_time = time.time()
+        if current_time - self.arp_cache_time > self.arp_cache_ttl:
+            self.arp_cache = get_arp_table()
+            self.arp_cache_time = current_time
+
+    def _get_mac_cached(self, ip: str) -> Optional[str]:
+        """Get MAC address from cache or lookup"""
+        # Check cache first
+        if ip in self.arp_cache:
+            return self.arp_cache[ip]
+
+        # Refresh cache if stale and check again
+        self._refresh_arp_cache()
+        return self.arp_cache.get(ip)
 
     def parse_input(self, input_text: str) -> List[str]:
         """
@@ -1377,15 +1449,12 @@ class PingMonitor:
 
                 # Get MAC address and vendor for reachable hosts
                 # Check if we already have it from a previous ping
-                existing_mac = None
                 if ip in self.results and self.results[ip].mac_address:
-                    existing_mac = self.results[ip].mac_address
-                    result.mac_address = existing_mac
+                    result.mac_address = self.results[ip].mac_address
                     result.vendor = self.results[ip].vendor
                 elif not result.mac_address:  # Only lookup if we don't have it yet
-                    # Small delay to let ARP table populate
-                    time.sleep(0.05)
-                    result.mac_address = get_mac_from_arp(ip)
+                    # Use cached ARP lookup (no delay needed, using batched table)
+                    result.mac_address = self._get_mac_cached(ip)
                     if result.mac_address:
                         result.vendor = get_vendor_from_mac(result.mac_address)
             else:
