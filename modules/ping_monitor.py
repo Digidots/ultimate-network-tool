@@ -1129,6 +1129,8 @@ class PingResult:
         self.consecutive_successes = 0
         self.mac_address = None
         self.vendor = None
+        self.total_success_count = 0  # Total successful pings
+        self.total_failure_count = 0  # Total failed pings
 
 
 class PingMonitor:
@@ -1408,19 +1410,42 @@ class PingMonitor:
                 ping_start = time.time()
 
                 # Perform a single ping (ping_count should be 1 for ping -t behavior)
-                result = self.ping_host(ip)
+                new_result = self.ping_host(ip)
 
-                # Preserve MAC and vendor from previous results if available
+                # If we have an existing result, accumulate the stats
                 if ip in self.results:
-                    if self.results[ip].mac_address and not result.mac_address:
-                        result.mac_address = self.results[ip].mac_address
-                        result.vendor = self.results[ip].vendor
+                    existing = self.results[ip]
+                    # Accumulate packets
+                    new_result.packets_sent = existing.packets_sent + new_result.packets_sent
+                    new_result.packets_received = existing.packets_received + new_result.packets_received
+                    # Recalculate packet loss
+                    if new_result.packets_sent > 0:
+                        new_result.packet_loss_percent = ((new_result.packets_sent - new_result.packets_received) / new_result.packets_sent) * 100
+                    # Accumulate success/failure counts
+                    new_result.total_success_count = existing.total_success_count
+                    new_result.total_failure_count = existing.total_failure_count
+                    # Update min/max across all pings
+                    if new_result.last_ping_time is not None:
+                        if existing.min_ping_ms is not None:
+                            new_result.min_ping_ms = min(existing.min_ping_ms, new_result.last_ping_time)
+                        if existing.max_ping_ms is not None:
+                            new_result.max_ping_ms = max(existing.max_ping_ms, new_result.last_ping_time)
+                    # Keep hostname and MAC info
+                    new_result.hostname = existing.hostname or new_result.hostname
+                    new_result.mac_address = existing.mac_address or new_result.mac_address
+                    new_result.vendor = existing.vendor or new_result.vendor
 
-                self.results[ip] = result
+                # Update success/failure counts for this ping
+                if new_result.status == "Reachable":
+                    new_result.total_success_count += 1
+                else:
+                    new_result.total_failure_count += 1
+
+                self.results[ip] = new_result
 
                 # Send callback immediately (live update)
                 if self.callback:
-                    self.callback(result)
+                    self.callback(new_result)
 
                 # If not continuous, stop after first ping
                 if not self.continuous:

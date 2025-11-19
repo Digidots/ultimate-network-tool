@@ -1596,13 +1596,14 @@
                             <th onclick="sortTable('ping')">Avg Ping (ms) ▼</th>
                             <th onclick="sortTable('packets')">Packets (Sent/Rcv) ▼</th>
                             <th onclick="sortTable('loss')">Loss % ▼</th>
+                            <th onclick="sortTable('success')">Success/Fail ▼</th>
                             <th onclick="sortTable('ttl')">TTL ▼</th>
                             <th onclick="sortTable('lastUpdate')">Last Update ▼</th>
                         </tr>
                     </thead>
                     <tbody id="resultsBody">
                         <tr>
-                            <td colspan="11">
+                            <td colspan="12">
                                 <div class="empty-state">
                                     Enter IP addresses or ranges above and click "Start Ping" to begin monitoring
                                 </div>
@@ -2008,8 +2009,9 @@
             // Detect network events (simultaneous failures)
             detectNetworkEvent();
 
-            // Update modal if showing this host
+            // Update modal if showing this host (live update)
             if (selectedHost === data.ip) {
+                updateModalStats(data);
                 renderHostPingHistory();
             }
 
@@ -2121,6 +2123,8 @@
                 const vendorDisplay = vendor !== 'Unknown' ?
                     `<span style="color: #94a3b8; font-size: 11px;">${vendor}</span>` :
                     `<span style="color: #64748b; font-size: 10px;">-</span>`;
+                const successCount = r.total_success_count || 0;
+                const failureCount = r.total_failure_count || 0;
 
                 return `
                     <tr onclick="showHostDetail('${r.ip}')">
@@ -2135,6 +2139,7 @@
                         <td>${avgPing}</td>
                         <td>${r.packets_sent}/${r.packets_received}</td>
                         <td>${r.packet_loss_percent.toFixed(0)}%</td>
+                        <td><span style="color: #10b981; font-weight: 600;">${successCount}</span> / <span style="color: #ef4444; font-weight: 600;">${failureCount}</span></td>
                         <td>${r.ttl || 'N/A'}</td>
                         <td>${lastUpdate}</td>
                     </tr>
@@ -2426,16 +2431,16 @@
             renderEventsView();
         }
 
-        // Show host detail
-        function showHostDetail(ip) {
-            selectedHost = ip;
-            const host = results.get(ip);
+        // Update modal stats (for live updates)
+        function updateModalStats(host) {
             if (!host) return;
 
-            document.getElementById('modalHostTitle').textContent = `${host.hostname || ip} - Detailed View`;
-
-            // Update stats
             const statsDiv = document.getElementById('modalStats');
+            if (!statsDiv) return;
+
+            const successCount = host.total_success_count || 0;
+            const failureCount = host.total_failure_count || 0;
+
             statsDiv.innerHTML = `
                 <div class="modal-stat">
                     <div class="modal-stat-label">IP Address</div>
@@ -2462,14 +2467,34 @@
                     <div class="modal-stat-value">${host.packet_loss_percent.toFixed(0)}%</div>
                 </div>
                 <div class="modal-stat">
+                    <div class="modal-stat-label">Success Pings</div>
+                    <div class="modal-stat-value" style="color: #10b981;">${successCount}</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-label">Failed Pings</div>
+                    <div class="modal-stat-value" style="color: #ef4444;">${failureCount}</div>
+                </div>
+                <div class="modal-stat">
                     <div class="modal-stat-label">TTL</div>
                     <div class="modal-stat-value">${host.ttl || 'N/A'}</div>
                 </div>
                 <div class="modal-stat">
                     <div class="modal-stat-label">Total Pings</div>
-                    <div class="modal-stat-value">${pingHistory.get(ip)?.length || 0}</div>
+                    <div class="modal-stat-value">${pingHistory.get(host.ip)?.length || 0}</div>
                 </div>
             `;
+        }
+
+        // Show host detail
+        function showHostDetail(ip) {
+            selectedHost = ip;
+            const host = results.get(ip);
+            if (!host) return;
+
+            document.getElementById('modalHostTitle').textContent = `${host.hostname || ip} - Detailed View`;
+
+            // Update stats using the shared function
+            updateModalStats(host);
 
             // Reset filter
             hostPingFilter = 'all';
@@ -2683,7 +2708,7 @@
                 return;
             }
 
-            const headers = ['IP Address', 'Hostname', 'Status', 'Avg Ping (ms)', 'Min Ping (ms)', 'Max Ping (ms)', 'Packets Sent', 'Packets Received', 'Loss %', 'TTL', 'Last Update'];
+            const headers = ['IP Address', 'Hostname', 'Status', 'Avg Ping (ms)', 'Min Ping (ms)', 'Max Ping (ms)', 'Packets Sent', 'Packets Received', 'Loss %', 'Success Count', 'Failure Count', 'Vendor', 'TTL', 'Last Update'];
             const rows = Array.from(results.values()).map(r => [
                 r.ip,
                 r.hostname || 'N/A',
@@ -2694,6 +2719,9 @@
                 r.packets_sent,
                 r.packets_received,
                 r.packet_loss_percent.toFixed(0),
+                r.total_success_count || 0,
+                r.total_failure_count || 0,
+                r.vendor || 'Unknown',
                 r.ttl || 'N/A',
                 new Date(r.last_update).toLocaleString()
             ]);

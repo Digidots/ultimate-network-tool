@@ -419,7 +419,9 @@ def handle_start_ping(data):
             'ttl': result.ttl,
             'last_update': result.last_update.isoformat(),
             'mac_address': result.mac_address,
-            'vendor': result.vendor
+            'vendor': result.vendor,
+            'total_success_count': result.total_success_count,
+            'total_failure_count': result.total_failure_count
         })
 
     try:
