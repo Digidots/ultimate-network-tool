@@ -75,8 +75,16 @@
             box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
             transition: left 0.3s ease;
             z-index: 1000;
-            padding: 90px 0 20px 0;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Fixed header area to prevent overlap */
+        .sidebar::before {
+            content: '';
+            display: block;
+            height: 70px;
+            flex-shrink: 0;
         }
 
         .menu-toggle:checked ~ .sidebar {
@@ -87,6 +95,14 @@
             padding: 0 24px 20px 24px;
             border-bottom: 1px solid rgba(59, 130, 246, 0.2);
             margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        /* Scrollable menu container */
+        .menu-container {
+            overflow-y: auto;
+            flex: 1;
+            padding-bottom: 20px;
         }
 
         .sidebar-title {
@@ -968,53 +984,38 @@
             <div class="sidebar-subtitle">Select a tool to use</div>
         </div>
 
-        <div class="menu-section">
-            <div class="menu-section-title">Main Tools</div>
-            <a href="/" class="menu-item active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-                <span class="menu-item-text">Home</span>
-            </a>
-        </div>
+        <div class="menu-container">
+            <div class="menu-section">
+                <div class="menu-section-title">Network Tools</div>
+                <a href="/" class="menu-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" opacity="0.5"></rect>
+                    </svg>
+                    <span class="menu-item-text">Network Discovery</span>
+                </a>
+                <a href="/ping" class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <circle cx="12" cy="12" r="9"></circle>
+                    </svg>
+                    <span class="menu-item-text">Ping Monitor</span>
+                </a>
+            </div>
 
-        <div class="menu-section">
-            <div class="menu-section-title">Discovery Tools</div>
-            <a href="#discovery" class="menu-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
-                </svg>
-                <span class="menu-item-text">Switch Discovery</span>
-            </a>
-            <a href="#vlan" class="menu-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                </svg>
-                <span class="menu-item-text">VLAN Detection</span>
-            </a>
-            <a href="/ping" class="menu-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="1"></circle>
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <circle cx="12" cy="12" r="9"></circle>
-                </svg>
-                <span class="menu-item-text">Ping Monitor</span>
-            </a>
-        </div>
-
-        <div class="menu-section">
-            <div class="menu-section-title">Coming Soon</div>
-            <a href="#" class="menu-item" style="opacity: 0.5; pointer-events: none;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                <span class="menu-item-text">More Tools Coming...</span>
-            </a>
+            <div class="menu-section">
+                <div class="menu-section-title">Coming Soon</div>
+                <a href="#" class="menu-item" style="opacity: 0.5; pointer-events: none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span class="menu-item-text">More Tools Coming...</span>
+                </a>
+            </div>
         </div>
     </nav>
 
@@ -1046,7 +1047,7 @@
                     <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
                 </svg>
                 <div class="brand-text">
-                    <h1>ULTIMATE NETWORK TOOL</h1>
+                    <h1>ULTIMATE NETWORK TOOL <span style="font-size: 0.4em; color: #64748b; font-weight: 400;">v3.0.0</span></h1>
                     <span class="tagline">Enterprise Network Discovery & Analysis</span>
                 </div>
                 <div class="admin-status">
