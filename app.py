@@ -389,6 +389,12 @@ def ping():
     return render_template('ping.html')
 
 
+@app.route('/subnet')
+def subnet():
+    """Serve subnet calculator page"""
+    return render_template('subnet.html')
+
+
 @socketio.on('start_ping')
 def handle_start_ping(data):
     """Start ping monitoring"""
