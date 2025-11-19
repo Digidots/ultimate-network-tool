@@ -1,6 +1,40 @@
 # Ultimate Network Tool - Version History
 
-## Current Version: 3.1.1
+## Current Version: 3.2.0
+
+---
+
+## Version 3.2.0 (2025-11-19)
+
+### New Application: Smart Subnet Calculator
+- **NEW Complete subnet calculator application** with comprehensive features
+  - IP/CIDR Calculator with network, broadcast, and usable range calculations
+  - Binary subnet mask visualization and wildcard mask display
+  - Next/Previous subnet navigation
+  - Private IP detection with RFC1918 badges
+- **Quick Presets** - One-click buttons for common subnet sizes (/24-/30)
+- **IP in Subnet Checker** - Verify if an IP belongs to a subnet with visual results
+- **Subnet Splitter** - Split subnets into 2-256 smaller subnets
+- **Supernet Calculator** - Combine adjacent subnets for route summarization
+- **VLSM Helper** - Variable Length Subnet Masking with optimal allocation
+  - Enter department names and required host counts
+  - Automatic optimal subnet allocation
+  - Minimizes address space waste
+- **Visual Subnet Map** - Color-coded graphical subnet representation
+- **IPv6 Calculator** - Full IPv6 support with prefix calculations
+  - Address expansion/compression
+  - IPv6 type detection (Link-Local, ULA, Global, Multicast)
+  - /64 subnet calculations
+
+### Menu Updates
+- Added Subnet Calculator to navigation menu on all pages
+- Consistent menu structure across Network Discovery, Ping Monitor, and Subnet Calculator
+
+### UI/UX Improvements
+- Responsive two-column layout for related features
+- Real-time calculations without page reload
+- Auto-calculation on page load with example subnet
+- Matching glassmorphism design with existing tools
 
 ---
 
