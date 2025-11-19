@@ -116,6 +116,12 @@
             padding: 0 24px 12px 24px;
         }
 
+        .menu-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
         .menu-item {
             display: flex;
             align-items: center;
@@ -1288,53 +1294,38 @@
             <div class="sidebar-subtitle">Select a tool to use</div>
         </div>
 
-        <div class="menu-section">
-            <div class="menu-section-title">Main Tools</div>
-            <a href="/" class="menu-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-                <span class="menu-item-text">Home</span>
-            </a>
-        </div>
+        <div class="menu-container">
+            <div class="menu-section">
+                <div class="menu-section-title">Network Tools</div>
+                <a href="/" class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" opacity="0.5"></rect>
+                    </svg>
+                    <span class="menu-item-text">Network Discovery</span>
+                </a>
+                <a href="/ping" class="menu-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <circle cx="12" cy="12" r="9"></circle>
+                    </svg>
+                    <span class="menu-item-text">Ping Monitor</span>
+                </a>
+            </div>
 
-        <div class="menu-section">
-            <div class="menu-section-title">Discovery Tools</div>
-            <a href="/#discovery" class="menu-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
-                </svg>
-                <span class="menu-item-text">Switch Discovery</span>
-            </a>
-            <a href="/#vlan" class="menu-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                </svg>
-                <span class="menu-item-text">VLAN Detection</span>
-            </a>
-            <a href="/ping" class="menu-item active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="1"></circle>
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <circle cx="12" cy="12" r="9"></circle>
-                </svg>
-                <span class="menu-item-text">Ping Monitor</span>
-            </a>
-        </div>
-
-        <div class="menu-section">
-            <div class="menu-section-title">Coming Soon</div>
-            <a href="#" class="menu-item" style="opacity: 0.5; pointer-events: none;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                <span class="menu-item-text">More Tools Coming...</span>
-            </a>
+            <div class="menu-section">
+                <div class="menu-section-title">Coming Soon</div>
+                <a href="#" class="menu-item" style="opacity: 0.5; pointer-events: none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span class="menu-item-text">More Tools Coming...</span>
+                </a>
+            </div>
         </div>
     </nav>
 
@@ -1504,15 +1495,6 @@
                 <div class="stat-card">
                     <div class="stat-label">Avg Response</div>
                     <div class="stat-value" id="statAvgPing">0ms</div>
-                </div>
-            </div>
-
-            <!-- Correlation Analysis -->
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(148, 163, 184, 0.15);">
-                <div class="section-title" style="font-size: 16px; margin-bottom: 16px;">Correlation Analysis</div>
-                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 12px;">Hosts that frequently fail together (indicating shared infrastructure or network segments)</div>
-                <div id="correlationList" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto;">
-                    <div style="color: #64748b; font-size: 11px; text-align: center; padding: 20px;">No correlation data yet...</div>
                 </div>
             </div>
         </div>
@@ -1923,9 +1905,6 @@
             // Detect network events (simultaneous failures)
             detectNetworkEvent();
 
-            // Update correlation analysis
-            updateCorrelations();
-
             // Update modal if showing this host
             if (selectedHost === data.ip) {
                 renderHostPingHistory();
@@ -2309,90 +2288,6 @@
             renderEventsView();
         }
 
-        // ===== CORRELATION ANALYSIS FUNCTIONS =====
-
-        // Global state for correlation tracking
-        let coFailureTracking = new Map(); // Track how often hosts fail together
-
-        // Update correlation data
-        function updateCorrelations() {
-            if (results.size < 2) return; // Need at least 2 hosts
-
-            // Get currently failing hosts
-            const failingHosts = Array.from(results.entries())
-                .filter(([ip, data]) => data.status === 'Unreachable')
-                .map(([ip, data]) => ip);
-
-            // Skip if less than 2 hosts are failing
-            if (failingHosts.length < 2) return;
-
-            // Track co-failures for each pair
-            for (let i = 0; i < failingHosts.length; i++) {
-                for (let j = i + 1; j < failingHosts.length; j++) {
-                    const host1 = failingHosts[i];
-                    const host2 = failingHosts[j];
-                    const pairKey = [host1, host2].sort().join('|');
-
-                    if (!coFailureTracking.has(pairKey)) {
-                        coFailureTracking.set(pairKey, {
-                            host1: host1,
-                            host2: host2,
-                            coFailures: 0,
-                            lastFailure: null
-                        });
-                    }
-
-                    const tracking = coFailureTracking.get(pairKey);
-                    tracking.coFailures++;
-                    tracking.lastFailure = new Date();
-                }
-            }
-        }
-
-        // Render correlation analysis
-        function renderCorrelationAnalysis() {
-            const correlationList = document.getElementById('correlationList');
-
-            if (coFailureTracking.size === 0) {
-                correlationList.innerHTML = '<div style="color: #64748b; font-size: 11px; text-align: center; padding: 20px;">No correlation data yet...</div>';
-                return;
-            }
-
-            // Sort by co-failure count
-            const sorted = Array.from(coFailureTracking.values())
-                .filter(c => c.coFailures >= 3) // Only show significant correlations
-                .sort((a, b) => b.coFailures - a.coFailures)
-                .slice(0, 10); // Show top 10
-
-            if (sorted.length === 0) {
-                correlationList.innerHTML = '<div style="color: #64748b; font-size: 11px; text-align: center; padding: 20px;">No significant correlations yet (min 3 co-failures required)</div>';
-                return;
-            }
-
-            correlationList.innerHTML = sorted.map(c => {
-                const tag1 = getHostTag(c.host1);
-                const tag2 = getHostTag(c.host2);
-                const tagDisplay1 = tag1 ? `<span class="host-tag" style="font-size: 8px; margin-left: 4px;">${tag1}</span>` : '';
-                const tagDisplay2 = tag2 ? `<span class="host-tag" style="font-size: 8px; margin-left: 4px;">${tag2}</span>` : '';
-
-                return `
-                    <div style="background: rgba(30, 41, 59, 0.5); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.1);">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="font-size: 10px; color: #e2e8f0;">
-                                <span style="font-weight: 600;">${c.host1}</span>${tagDisplay1}
-                                <span style="color: #64748b; margin: 0 4px;">⟷</span>
-                                <span style="font-weight: 600;">${c.host2}</span>${tagDisplay2}
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="font-size: 9px; color: #94a3b8;">${c.coFailures} co-failures</span>
-                                <span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: 600;">HIGH</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
         // Show host detail
         function showHostDetail(ip) {
             selectedHost = ip;
@@ -2521,9 +2416,6 @@
             document.getElementById('statUnreachable').textContent = unreachable;
             document.getElementById('statPercent').textContent = `${percent}%`;
             document.getElementById('statAvgPing').textContent = `${avgPing}ms`;
-
-            // Update correlation analysis
-            renderCorrelationAnalysis();
         }
 
         // Filter results
