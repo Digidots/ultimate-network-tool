@@ -1,6 +1,36 @@
 # Ultimate Network Tool - Version History
 
-## Current Version: 3.1.0
+## Current Version: 3.1.1
+
+---
+
+## Version 3.1.1 (2025-11-19)
+
+### Ping Monitor Enhancements
+- **Event Detection Fix** - Events now only track hosts that were initially reachable
+  - Filters out always-unreachable hosts from event detection
+  - More accurate percentage calculations based on reachable hosts
+  - Prevents false positives from misconfigured IPs
+- **Host Tagging System** - NEW feature to organize and categorize hosts
+  - Tag hosts with custom labels (e.g., "Server", "Switch", "Workstation")
+  - Click the edit icon (✎) in the Tag column to add/edit tags
+  - Tags persist across sessions via localStorage
+  - Tag badges displayed with purple styling
+- **Correlation Analysis** - NEW feature showing which hosts fail together
+  - Automatically detects co-failure patterns (hosts failing simultaneously)
+  - Displayed in Statistics section below standard metrics
+  - Helps identify shared infrastructure or network segments
+  - Shows top 10 correlations with minimum 3 co-failures
+- **GUI Performance Improvement** - Reduced update throttle from 500ms to 100ms
+  - 5x faster UI updates (10 times per second vs 2 times per second)
+  - More responsive real-time monitoring
+
+### Technical Improvements
+- Added `wasEverReachable` flag to host failure tracking
+- Implemented `hostTags` Map with localStorage persistence
+- Added `coFailureTracking` Map for correlation analysis
+- Enhanced event detection with reachability filtering
+- Optimized render throttle for better responsiveness
 
 ---
 
