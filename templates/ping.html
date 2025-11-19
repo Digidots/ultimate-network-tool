@@ -1154,16 +1154,16 @@
         .event-item {
             background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
             border: 1px solid rgba(148, 163, 184, 0.15);
-            border-left: 4px solid;
-            border-radius: 10px;
-            padding: 16px;
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
+            border-left: 3px solid;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
         }
 
         .event-item:hover {
-            transform: translateX(4px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            background: rgba(30, 41, 59, 0.6);
+            border-color: rgba(148, 163, 184, 0.25);
         }
 
         .event-item.network-outage {
@@ -2236,7 +2236,7 @@
             const eventsList = document.getElementById('eventsList');
 
             if (networkEvents.length === 0) {
-                eventsList.innerHTML = '<div class="empty-state">No events detected yet. Events will appear when 3+ hosts fail simultaneously for 3+ consecutive pings.</div>';
+                eventsList.innerHTML = '<div class="empty-state">No events detected yet. Events will appear when 3+ hosts fail simultaneously for 5+ consecutive pings.</div>';
                 updateEventStats();
                 return;
             }
@@ -2250,30 +2250,33 @@
                 filteredEvents = networkEvents.filter(e => e.type === 'group-failure');
             }
 
+            // Store current scroll position
+            const currentScrollPos = eventsList.scrollTop;
+
             eventsList.innerHTML = filteredEvents.map(event => {
                 const typeText = event.type === 'network-outage' ? '🔴 Network Outage' :
                                 event.type === 'partial-outage' ? '🟠 Partial Outage' : '🟡 Host Group Failure';
 
                 const affectedCount = event.affectedHosts.length;
-                const totalHosts = results.size;
-                const percentageAffected = ((affectedCount / totalHosts) * 100).toFixed(1);
 
                 return `
                     <div class="event-item ${event.type}">
-                        <div class="event-header">
-                            <div class="event-type">${typeText}</div>
-                            <div class="event-time">${event.timestamp.toLocaleTimeString()}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 12px; font-weight: 600;">${typeText}</span>
+                            <span style="font-size: 11px; color: #94a3b8;">${event.timestamp.toLocaleTimeString()}</span>
                         </div>
-                        <div class="event-details">
-                            <strong>${affectedCount}</strong> of <strong>${totalHosts}</strong> hosts (${percentageAffected}%) experienced simultaneous failures
+                        <div style="font-size: 11px; color: #cbd5e1; margin-bottom: 6px;">
+                            <strong>${affectedCount}</strong> host${affectedCount > 1 ? 's' : ''} affected (${event.percentageAffected}%)
                         </div>
-                        <div class="event-hosts">
-                            ${event.affectedHosts.map(ip => `<span class="event-host-badge">${ip}</span>`).join('')}
+                        <div style="font-size: 10px; color: #94a3b8; max-height: 60px; overflow-y: auto;">
+                            ${event.affectedHosts.join(', ')}
                         </div>
-                        ${event.duration ? `<div class="event-duration">Duration: ${event.duration}</div>` : ''}
                     </div>
                 `;
             }).join('');
+
+            // Restore scroll position to prevent jumping
+            eventsList.scrollTop = currentScrollPos;
 
             updateEventStats();
         }
@@ -2292,15 +2295,18 @@
 
         // Detect network events (called from updateResult)
         function detectNetworkEvent() {
-            if (results.size < 3) return; // Need at least 3 hosts to detect group failures
-
-            // Count current failures (hosts that are Unreachable)
-            const currentFailures = Array.from(results.values()).filter(r => r.status === 'Unreachable');
+            // Need at least 5 hosts actively being monitored to detect group failures
+            if (results.size < 5) return;
 
             // Update failure tracking for each host
             results.forEach((result, ip) => {
                 if (!hostFailureTracking.has(ip)) {
-                    hostFailureTracking.set(ip, { consecutiveFailures: 0, lastStatus: null, wasEverReachable: false });
+                    hostFailureTracking.set(ip, {
+                        consecutiveFailures: 0,
+                        lastStatus: null,
+                        wasEverReachable: false,
+                        firstFailureTime: null
+                    });
                 }
 
                 const tracking = hostFailureTracking.get(ip);
@@ -2308,6 +2314,7 @@
                 // Mark as reachable if host responds
                 if (result.status === 'Reachable') {
                     tracking.wasEverReachable = true;
+                    tracking.firstFailureTime = null; // Reset failure timer
                 }
 
                 // Only track failures for hosts that were ever reachable
@@ -2317,33 +2324,45 @@
                             tracking.consecutiveFailures++;
                         } else {
                             tracking.consecutiveFailures = 1;
+                            tracking.firstFailureTime = Date.now(); // Record when failures started
                         }
                     } else {
                         tracking.consecutiveFailures = 0;
+                        tracking.firstFailureTime = null;
                     }
                 }
 
                 tracking.lastStatus = result.status;
             });
 
-            // Find hosts with 3+ consecutive failures (only hosts that were ever reachable)
-            const hostsWithConsecutiveFailures = Array.from(hostFailureTracking.entries())
-                .filter(([ip, tracking]) => tracking.wasEverReachable && tracking.consecutiveFailures >= 3)
+            // Count hosts that were ever reachable (actively monitored)
+            const totalMonitoredHosts = Array.from(hostFailureTracking.values())
+                .filter(tracking => tracking.wasEverReachable).length;
+
+            // Require at least 5 actively monitored hosts
+            if (totalMonitoredHosts < 5) return;
+
+            // Find hosts with 5+ consecutive failures AND failures persisting for 15+ seconds
+            const now = Date.now();
+            const hostsWithPersistentFailures = Array.from(hostFailureTracking.entries())
+                .filter(([ip, tracking]) => {
+                    return tracking.wasEverReachable &&
+                           tracking.consecutiveFailures >= 5 &&
+                           tracking.firstFailureTime &&
+                           (now - tracking.firstFailureTime) >= 15000; // 15 seconds minimum
+                })
                 .map(([ip, tracking]) => ip);
 
-            // Detect simultaneous failures (3+ hosts with 3+ consecutive failures)
-            if (hostsWithConsecutiveFailures.length >= 3) {
-                // Only count hosts that were ever reachable
-                const totalReachableHosts = Array.from(hostFailureTracking.values())
-                    .filter(tracking => tracking.wasEverReachable).length;
-                const affectedCount = hostsWithConsecutiveFailures.length;
-                const percentageAffected = (affectedCount / totalReachableHosts) * 100;
+            // Detect simultaneous failures (3+ hosts with persistent failures)
+            if (hostsWithPersistentFailures.length >= 3) {
+                const affectedCount = hostsWithPersistentFailures.length;
+                const percentageAffected = (affectedCount / totalMonitoredHosts) * 100;
 
                 // Check if this event already exists (avoid duplicates)
                 const recentEvent = networkEvents[networkEvents.length - 1];
                 const sameHosts = recentEvent &&
                     JSON.stringify(recentEvent.affectedHosts.sort()) ===
-                    JSON.stringify(hostsWithConsecutiveFailures.sort());
+                    JSON.stringify(hostsWithPersistentFailures.sort());
 
                 if (sameHosts) return; // Skip duplicate event
 
@@ -2351,24 +2370,24 @@
                 let eventType;
                 if (percentageAffected >= 50) {
                     eventType = 'network-outage'; // 50%+ hosts failing = network outage
-                } else if (percentageAffected >= 20) {
-                    eventType = 'partial-outage'; // 20-49% hosts = partial outage
+                } else if (percentageAffected >= 25) {
+                    eventType = 'partial-outage'; // 25-49% hosts = partial outage
                 } else {
-                    eventType = 'group-failure'; // 3-19% hosts = group failure
+                    eventType = 'group-failure'; // 3-24% hosts = group failure
                 }
 
                 // Create event
                 const event = {
                     type: eventType,
                     timestamp: new Date(),
-                    affectedHosts: [...hostsWithConsecutiveFailures],
-                    totalHosts: totalReachableHosts,
+                    affectedHosts: [...hostsWithPersistentFailures],
+                    totalHosts: totalMonitoredHosts,
                     percentageAffected: percentageAffected.toFixed(1)
                 };
 
                 networkEvents.push(event);
 
-                // Update events view if currently visible
+                // Update events view if currently visible (without scrolling)
                 if (currentView === 'events') {
                     renderEventsView();
                 }

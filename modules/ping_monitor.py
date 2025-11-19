@@ -1360,6 +1360,12 @@ class PingMonitor:
             if result.status == "Reachable":
                 result.consecutive_successes += 1
                 result.consecutive_failures = 0
+
+                # Get MAC address and vendor for reachable hosts
+                if not result.mac_address:  # Only lookup once
+                    result.mac_address = get_mac_from_arp(ip)
+                    if result.mac_address:
+                        result.vendor = get_vendor_from_mac(result.mac_address)
             else:
                 result.consecutive_failures += 1
                 result.consecutive_successes = 0
@@ -1403,6 +1409,13 @@ class PingMonitor:
 
                 # Perform a single ping (ping_count should be 1 for ping -t behavior)
                 result = self.ping_host(ip)
+
+                # Preserve MAC and vendor from previous results if available
+                if ip in self.results:
+                    if self.results[ip].mac_address and not result.mac_address:
+                        result.mac_address = self.results[ip].mac_address
+                        result.vendor = self.results[ip].vendor
+
                 self.results[ip] = result
 
                 # Send callback immediately (live update)
