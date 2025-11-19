@@ -1,6 +1,50 @@
 # Ultimate Network Tool - Version History
 
-## Current Version: 3.2.0
+## Current Version: 3.3.0
+
+---
+
+## Version 3.3.0 (2025-11-19)
+
+### Ping Monitor Major Improvements
+- **MAC Vendor Detection** - NEW vendor column in ping results
+  - Queries ARP table for MAC addresses of reachable hosts
+  - Displays vendor names (Cisco, Apple, VMware, etc.) using OUI database
+  - Shows 1000+ recognized vendors
+  - Vendor info preserved across ping updates for efficiency
+- **Ping Response Graph** - NEW visual graph in host detail modal
+  - Shows last 50 pings with response time visualization
+  - Blue line for successful pings, red dots for failures
+  - Auto-scaling Y-axis based on ping times
+  - Grid lines and labels for easy reading
+- **Fixed IP Address Sorting** - Properly sorts IPs numerically
+  - Was: 192.168.1.10 before 192.168.1.2 (string sort)
+  - Now: 192.168.1.2 before 192.168.1.10 (numeric sort)
+  - Converts IPs to integers for proper incremental sorting
+- **Improved Event Detection** - Dramatically reduced false positives
+  - Consecutive failure threshold increased: 3 → 5 pings
+  - Time-based persistence: failures must last 15+ seconds minimum
+  - Minimum hosts requirement: now requires 5 actively monitored hosts
+  - Only tracks hosts that were ever reachable (ignores empty IP space)
+  - Better thresholds: Network Outage 50%+, Partial Outage 25-49%, Group Failure 3-24%
+- **Compact Event UI** - Events display without movement/jumping
+  - Smaller, more readable event cards
+  - Preserves scroll position when events update (no more jumping)
+  - Removed jarring hover animations
+  - Compact fonts: title 12px, details 11px, hosts 10px
+
+### Subnet Calculator Polish
+- **Removed Visual Subnet Map** - Cleaned up interface by removing unused feature
+- **Added info icons to all tools** - Educational tooltips for every calculator section
+- **Reorganized tools** - VLSM Helper now 2nd position (professional emphasis)
+- **Enhanced tooltips** - Better explanations of VLSM vs Subnet Splitter differences
+
+### Technical Backend
+- Added `get_mac_from_arp()` and `get_vendor_from_mac()` functions
+- MAC/vendor fields added to WebSocket ping_result payload
+- IP sorting uses bitshift conversion for numeric comparison
+- Event detection tracks firstFailureTime with 15-second minimum persistence
+- Canvas-based graph rendering with grid, axis labels, and auto-scaling
 
 ---
 

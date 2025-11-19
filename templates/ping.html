@@ -1415,7 +1415,7 @@
                     <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
                 </svg>
                 <div class="brand-text">
-                    <h1 onclick="window.location.href='/'">ULTIMATE NETWORK TOOL <span style="font-size: 0.4em; color: #64748b; font-weight: 400;">v3.2.0</span></h1>
+                    <h1 onclick="window.location.href='/'">ULTIMATE NETWORK TOOL <span style="font-size: 0.4em; color: #64748b; font-weight: 400;">v3.3.0</span></h1>
                     <span class="tagline">Ping Monitor</span>
                 </div>
             </div>
@@ -1692,8 +1692,13 @@
                 <div class="modal-body">
                     <div class="modal-stats" id="modalStats"></div>
 
+                    <div style="margin-bottom: 16px;">
+                        <div class="section-title" style="margin-bottom: 12px; font-size: 15px;">Ping Response Graph</div>
+                        <canvas id="pingGraph" width="800" height="150" style="width: 100%; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(148, 163, 184, 0.1); border-radius: 8px;"></canvas>
+                    </div>
+
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <div class="section-title" style="margin-bottom: 0;">Ping History</div>
+                        <div class="section-title" style="margin-bottom: 0; font-size: 15px;">Ping History</div>
                         <div class="filter-buttons">
                             <button class="filter-btn active" onclick="filterHostPings('all')">All</button>
                             <button class="filter-btn" onclick="filterHostPings('success')">Success Only</button>
@@ -2075,12 +2080,27 @@
                 let aVal = a[sortColumn] || '';
                 let bVal = b[sortColumn] || '';
 
-                if (sortColumn === 'ping') {
+                if (sortColumn === 'ip') {
+                    // Sort IP addresses numerically
+                    const ipToNum = (ip) => {
+                        const parts = ip.split('.');
+                        return (parseInt(parts[0]) << 24) + (parseInt(parts[1]) << 16) +
+                               (parseInt(parts[2]) << 8) + parseInt(parts[3]);
+                    };
+                    aVal = ipToNum(a.ip);
+                    bVal = ipToNum(b.ip);
+                } else if (sortColumn === 'ping') {
                     aVal = a.avg_ping_ms || 9999;
                     bVal = b.avg_ping_ms || 9999;
                 } else if (sortColumn === 'loss') {
                     aVal = a.packet_loss_percent || 0;
                     bVal = b.packet_loss_percent || 0;
+                } else if (sortColumn === 'packets') {
+                    aVal = a.packets_sent || 0;
+                    bVal = b.packets_sent || 0;
+                } else if (sortColumn === 'ttl') {
+                    aVal = a.ttl || 0;
+                    bVal = b.ttl || 0;
                 }
 
                 if (sortAscending) {
@@ -2457,8 +2477,92 @@
             document.querySelectorAll('.modal-body .filter-btn')[0].classList.add('active');
 
             renderHostPingHistory();
+            drawPingGraph(ip);
 
             document.getElementById('hostModal').classList.add('show');
+        }
+
+        // Draw ping response time graph
+        function drawPingGraph(ip) {
+            const canvas = document.getElementById('pingGraph');
+            const ctx = canvas.getContext('2d');
+            const history = pingHistory.get(ip) || [];
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (history.length === 0) {
+                ctx.fillStyle = '#64748b';
+                ctx.font = '14px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText('No ping data available yet', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            // Get last 50 pings
+            const data = history.slice(-50);
+            const padding = 40;
+            const graphWidth = canvas.width - padding * 2;
+            const graphHeight = canvas.height - padding * 2;
+
+            // Find max ping time for scaling (ignore failures)
+            const pings = data.filter(p => p.status === 'Reachable').map(p => p.rtt);
+            const maxPing = Math.max(...pings, 10); // Min 10ms scale
+            const minPing = Math.min(...pings, 0);
+
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.1)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (graphHeight / 4) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(canvas.width - padding, y);
+                ctx.stroke();
+
+                // Y-axis labels
+                const value = maxPing - (maxPing / 4) * i;
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '10px Segoe UI';
+                ctx.textAlign = 'right';
+                ctx.fillText(value.toFixed(0) + 'ms', padding - 8, y + 4);
+            }
+
+            // Draw ping line
+            ctx.strokeStyle = '#60a5fa';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            data.forEach((ping, i) => {
+                const x = padding + (graphWidth / (data.length - 1 || 1)) * i;
+
+                if (ping.status === 'Reachable') {
+                    const y = padding + graphHeight - ((ping.rtt - minPing) / (maxPing - minPing || 1)) * graphHeight;
+
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+
+                    // Draw point
+                    ctx.fillStyle = '#60a5fa';
+                    ctx.fillRect(x - 2, y - 2, 4, 4);
+                } else {
+                    // Draw red dot for failed pings
+                    const y = padding + graphHeight;
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fillRect(x - 2, y - 2, 4, 4);
+                }
+            });
+
+            ctx.stroke();
+
+            // Draw axis labels
+            ctx.fillStyle = '#cbd5e1';
+            ctx.font = '11px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('Last ' + data.length + ' Pings', canvas.width / 2, canvas.height - 5);
         }
 
         // Filter host pings

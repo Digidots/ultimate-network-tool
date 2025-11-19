@@ -417,7 +417,9 @@ def handle_start_ping(data):
             'packets_received': result.packets_received,
             'packet_loss_percent': result.packet_loss_percent,
             'ttl': result.ttl,
-            'last_update': result.last_update.isoformat()
+            'last_update': result.last_update.isoformat(),
+            'mac_address': result.mac_address,
+            'vendor': result.vendor
         })
 
     try:
