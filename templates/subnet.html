@@ -439,12 +439,6 @@
             font-size: 13px;
         }
 
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
         .vlsm-input {
             display: flex;
             gap: 8px;
@@ -533,12 +527,6 @@
             color: #60a5fa;
             font-size: 18px;
             font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            .two-column {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -684,53 +672,59 @@
             <div id="results" class="result-grid" style="display: none;"></div>
         </div>
 
-        <!-- TWO COLUMN LAYOUT -->
-        <div class="two-column">
-            <!-- IP IN SUBNET CHECKER -->
-            <div class="calculator-section">
-                <div class="section-title">
-                    🔍 IP in Subnet Checker
-                    <span class="info-icon" data-tooltip="Verify if a specific IP address falls within a given subnet range. Useful for troubleshooting network connectivity.">ℹ</span>
-                </div>
-                <div class="section-subtitle">Check if an IP belongs to a subnet</div>
+        <!-- VLSM HELPER -->
+        <div class="calculator-section">
+            <div class="section-title">
+                🎯 VLSM Helper
+                <span class="info-icon" data-tooltip="Variable Length Subnet Masking allocates optimal subnet sizes based on actual host requirements. More efficient than equal splitting - minimizes IP waste by using different CIDR sizes for different needs.">ℹ</span>
+            </div>
+            <div class="section-subtitle">Optimal subnet allocation based on actual requirements - the professional way to design networks</div>
 
-                <div class="input-group">
-                    <label class="input-label">IP Address to Check</label>
-                    <input type="text" id="checkIp" class="input-field" placeholder="192.168.1.100">
-                </div>
-
-                <div class="input-group">
-                    <label class="input-label">Subnet CIDR</label>
-                    <input type="text" id="checkSubnet" class="input-field" placeholder="192.168.1.0/24">
-                </div>
-
-                <button class="btn" onclick="checkIpInSubnet()">Check</button>
-
-                <div id="checkResult" style="margin-top: 16px;"></div>
+            <div class="input-group">
+                <label class="input-label">Base Network</label>
+                <input type="text" id="vlsmBase" class="input-field" placeholder="192.168.1.0/24">
             </div>
 
-            <!-- SUBNET SPLITTER -->
-            <div class="calculator-section">
-                <div class="section-title">
-                    ✂️ Subnet Splitter
-                    <span class="info-icon" data-tooltip="Divide a larger subnet into multiple smaller subnets of equal size. Calculates new CIDR and usable ranges automatically.">ℹ</span>
+            <div class="input-group">
+                <label class="input-label">
+                    Required Hosts per Subnet
+                    <span class="info-icon" data-tooltip="Enter department/purpose and host count. VLSM automatically calculates the smallest CIDR that fits each requirement, ordered largest to smallest for optimal allocation.">ℹ</span>
+                </label>
+                <div id="vlsmInputs">
+                    <div class="vlsm-input">
+                        <input type="text" class="input-field" placeholder="Department name">
+                        <input type="number" class="input-field" placeholder="Required hosts" min="1">
+                    </div>
                 </div>
-                <div class="section-subtitle">Split a subnet into smaller subnets</div>
-
-                <div class="input-group">
-                    <label class="input-label">Base Subnet</label>
-                    <input type="text" id="splitSubnet" class="input-field" placeholder="192.168.1.0/24">
-                </div>
-
-                <div class="input-group">
-                    <label class="input-label">Number of Subnets</label>
-                    <input type="number" id="splitCount" class="input-field" placeholder="4" value="4" min="2" max="256">
-                </div>
-
-                <button class="btn" onclick="splitSubnet()">Split</button>
-
-                <div id="splitResults" class="subnet-list"></div>
+                <button class="add-vlsm-btn" onclick="addVlsmInput()">+ Add Another Subnet</button>
             </div>
+
+            <button class="btn" onclick="calculateVLSM()">Calculate VLSM</button>
+
+            <div id="vlsmResults" class="subnet-list"></div>
+        </div>
+
+        <!-- SUBNET SPLITTER -->
+        <div class="calculator-section">
+            <div class="section-title">
+                ✂️ Subnet Splitter
+                <span class="info-icon" data-tooltip="Divide a larger subnet into multiple equal-sized smaller subnets. Simple uniform division - all resulting subnets will be identical in size.">ℹ</span>
+            </div>
+            <div class="section-subtitle">Split a subnet into equal-sized smaller subnets</div>
+
+            <div class="input-group">
+                <label class="input-label">Base Subnet</label>
+                <input type="text" id="splitSubnet" class="input-field" placeholder="192.168.1.0/24">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Number of Subnets</label>
+                <input type="number" id="splitCount" class="input-field" placeholder="4" value="4" min="2" max="256">
+            </div>
+
+            <button class="btn" onclick="splitSubnet()">Split</button>
+
+            <div id="splitResults" class="subnet-list"></div>
         </div>
 
         <!-- SUPERNET CALCULATOR -->
@@ -749,35 +743,6 @@
             <button class="btn" onclick="calculateSupernet()">Calculate Supernet</button>
 
             <div id="supernetResult" style="margin-top: 16px;"></div>
-        </div>
-
-        <!-- VLSM HELPER -->
-        <div class="calculator-section">
-            <div class="section-title">
-                🎯 VLSM Helper
-                <span class="info-icon" data-tooltip="Variable Length Subnet Masking allocates optimal subnet sizes based on actual host requirements. Minimizes IP waste by using different CIDR sizes.">ℹ</span>
-            </div>
-            <div class="section-subtitle">Variable Length Subnet Masking - optimal subnet allocation</div>
-
-            <div class="input-group">
-                <label class="input-label">Base Network</label>
-                <input type="text" id="vlsmBase" class="input-field" placeholder="192.168.1.0/24">
-            </div>
-
-            <div class="input-group">
-                <label class="input-label">Required Hosts per Subnet</label>
-                <div id="vlsmInputs">
-                    <div class="vlsm-input">
-                        <input type="text" class="input-field" placeholder="Department name">
-                        <input type="number" class="input-field" placeholder="Required hosts" min="1">
-                    </div>
-                </div>
-                <button class="add-vlsm-btn" onclick="addVlsmInput()">+ Add Another Subnet</button>
-            </div>
-
-            <button class="btn" onclick="calculateVLSM()">Calculate VLSM</button>
-
-            <div id="vlsmResults" class="subnet-list"></div>
         </div>
 
         <!-- IPv6 SECTION -->
@@ -981,46 +946,6 @@
             const currentIp = document.getElementById('ipInput').value.split('/')[0] || '192.168.1.0';
             document.getElementById('ipInput').value = currentIp + cidr;
             calculate();
-        }
-
-        // ===== IP IN SUBNET CHECKER =====
-
-        function checkIpInSubnet() {
-            const checkIp = document.getElementById('checkIp').value.trim();
-            const subnet = document.getElementById('checkSubnet').value.trim();
-
-            if (!checkIp || !subnet) {
-                alert('Please enter both IP and subnet');
-                return;
-            }
-
-            const [subnetIp, cidr] = subnet.split('/');
-            const cidrNum = parseInt(cidr);
-            const maskInt = ~(2 ** (32 - cidrNum) - 1) >>> 0;
-
-            const checkIpInt = ipToInt(checkIp);
-            const subnetInt = ipToInt(subnetIp);
-            const networkInt = (subnetInt & maskInt) >>> 0;
-            const broadcastInt = (networkInt | ~maskInt) >>> 0;
-
-            const inSubnet = checkIpInt >= networkInt && checkIpInt <= broadcastInt;
-
-            const resultDiv = document.getElementById('checkResult');
-            if (inSubnet) {
-                resultDiv.innerHTML = `
-                    <div class="result-card" style="border: 2px solid #4ade80;">
-                        <div class="result-label">✅ Result</div>
-                        <div class="result-value" style="color: #4ade80;">IP ${checkIp} IS in subnet ${intToIp(networkInt)}/${cidrNum}</div>
-                    </div>
-                `;
-            } else {
-                resultDiv.innerHTML = `
-                    <div class="result-card" style="border: 2px solid #ef4444;">
-                        <div class="result-label">❌ Result</div>
-                        <div class="result-value" style="color: #ef4444;">IP ${checkIp} is NOT in subnet ${intToIp(networkInt)}/${cidrNum}</div>
-                    </div>
-                `;
-            }
         }
 
         // ===== SUBNET SPLITTER =====
