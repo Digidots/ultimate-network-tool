@@ -389,6 +389,12 @@ def ping():
     return render_template('ping.html')
 
 
+@app.route('/subnet')
+def subnet():
+    """Serve subnet calculator page"""
+    return render_template('subnet.html')
+
+
 @socketio.on('start_ping')
 def handle_start_ping(data):
     """Start ping monitoring"""
@@ -411,7 +417,11 @@ def handle_start_ping(data):
             'packets_received': result.packets_received,
             'packet_loss_percent': result.packet_loss_percent,
             'ttl': result.ttl,
-            'last_update': result.last_update.isoformat()
+            'last_update': result.last_update.isoformat(),
+            'mac_address': result.mac_address,
+            'vendor': result.vendor,
+            'total_success_count': result.total_success_count,
+            'total_failure_count': result.total_failure_count
         })
 
     try:

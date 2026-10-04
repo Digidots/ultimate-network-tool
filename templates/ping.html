@@ -116,6 +116,12 @@
             padding: 0 24px 12px 24px;
         }
 
+        .menu-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
         .menu-item {
             display: flex;
             align-items: center;
@@ -707,6 +713,60 @@
             color: white;
         }
 
+        /* Column Menu Styles */
+        .column-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            min-width: 200px;
+            padding: 8px 0;
+        }
+
+        .column-menu-header {
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            border-bottom: 1px solid #334155;
+            margin-bottom: 4px;
+        }
+
+        .column-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .column-menu-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .column-menu-item input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .column-menu-item span {
+            font-size: 13px;
+            color: #e2e8f0;
+        }
+
+        /* Hide columns when toggled */
+        th[data-column].hidden,
+        td[data-column].hidden {
+            display: none !important;
+        }
+
         .results-table-container {
             overflow-x: auto;
             border-radius: 10px;
@@ -715,7 +775,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         thead {
@@ -724,13 +784,13 @@
         }
 
         th {
-            padding: 8px 12px;
+            padding: 6px 8px;
             text-align: left;
             font-weight: 700;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-size: 10px;
+            letter-spacing: 0.3px;
+            font-size: 9px;
             cursor: pointer;
             user-select: none;
             transition: color 0.3s ease;
@@ -751,18 +811,79 @@
         }
 
         td {
-            padding: 8px 12px;
+            padding: 6px 8px;
             color: #cbd5e1;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .status-badge {
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 9px;
             font-weight: 700;
             text-transform: uppercase;
             display: inline-block;
+        }
+
+        .host-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 600;
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.2);
+            color: #c084fc;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            text-transform: capitalize;
+        }
+
+        .tag-cell {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tag-cell:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .host-tag-display {
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.2);
+            color: #c084fc;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            text-transform: capitalize;
+            transition: all 0.2s ease;
+        }
+
+        .host-tag-display:hover {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .tag-placeholder {
+            color: #64748b;
+            font-size: 10px;
+            font-style: italic;
+        }
+
+        .tag-input {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            border-radius: 4px;
+            padding: 4px 8px;
+            color: #f1f5f9;
+            font-size: 11px;
+            width: 100px;
+            outline: none;
+        }
+
+        .tag-input:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
         .status-reachable {
@@ -814,15 +935,15 @@
             background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
             border: 1px solid rgba(59, 130, 246, 0.3);
             border-radius: 16px;
-            max-width: 1200px;
+            max-width: 1000px;
             width: 100%;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         .modal-header {
-            padding: 24px;
+            padding: 16px 20px;
             border-bottom: 1px solid rgba(148, 163, 184, 0.2);
             display: flex;
             justify-content: space-between;
@@ -830,7 +951,7 @@
         }
 
         .modal-title {
-            font-size: 20px;
+            font-size: 17px;
             font-weight: 700;
             background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
             -webkit-background-clip: text;
@@ -842,11 +963,11 @@
             background: rgba(239, 68, 68, 0.2);
             border: 1px solid rgba(239, 68, 68, 0.3);
             color: #ef4444;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -859,49 +980,49 @@
         }
 
         .modal-body {
-            padding: 24px;
+            padding: 20px;
         }
 
         .modal-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
         .modal-stat {
             background: rgba(59, 130, 246, 0.1);
             border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 8px 10px;
             text-align: center;
         }
 
         .modal-stat-label {
-            font-size: 10px;
+            font-size: 9px;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 4px;
+            letter-spacing: 0.6px;
+            margin-bottom: 3px;
         }
 
         .modal-stat-value {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 700;
             color: #60a5fa;
         }
 
         .ping-history {
-            max-height: 400px;
+            max-height: 300px;
             overflow-y: auto;
         }
 
         .ping-item {
             background: rgba(15, 23, 42, 0.4);
             border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 8px;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -953,8 +1074,8 @@
 
         .timeline-host-label {
             background: rgba(15, 23, 42, 0.8);
-            padding: 12px;
-            font-size: 12px;
+            padding: 6px 10px;
+            font-size: 11px;
             font-weight: 600;
             color: #cbd5e1;
             display: flex;
@@ -965,7 +1086,7 @@
         .timeline-row {
             background: rgba(15, 23, 42, 0.6);
             display: flex;
-            min-height: 40px;
+            min-height: 24px;
         }
 
         .timeline-cell {
@@ -1018,109 +1139,178 @@
             text-align: center;
         }
 
-        /* ===== HEATMAP VIEW ===== */
-        .heatmap-container {
-            overflow-x: auto;
+        /* ===== EVENTS VIEW ===== */
+        .events-container {
             margin-top: 20px;
         }
 
-        .heatmap-grid {
+        .events-summary {
             display: grid;
-            gap: 2px;
-            min-width: 800px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
-        .heatmap-row {
-            display: grid;
-            grid-template-columns: 150px repeat(auto-fit, minmax(40px, 1fr));
-            gap: 2px;
-        }
-
-        .heatmap-host-label {
-            background: rgba(15, 23, 42, 0.8);
-            padding: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #cbd5e1;
+        .event-stat-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 16px;
             display: flex;
             align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
         }
 
-        .heatmap-cell {
-            min-width: 40px;
-            height: 40px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .event-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .event-stat-icon {
+            font-size: 32px;
+            line-height: 1;
+        }
+
+        .event-stat-details {
+            flex: 1;
+        }
+
+        .event-stat-label {
             font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 4px;
+        }
+
+        .event-stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .events-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .events-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .event-item {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-left: 3px solid;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .event-item:hover {
+            background: rgba(30, 41, 59, 0.6);
+            border-color: rgba(148, 163, 184, 0.25);
+        }
+
+        .event-item.network-outage {
+            border-left-color: #ef4444;
+        }
+
+        .event-item.partial-outage {
+            border-left-color: #f59e0b;
+        }
+
+        .event-item.group-failure {
+            border-left-color: #eab308;
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .event-type {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
             font-weight: 700;
         }
 
-        .heatmap-cell:hover {
-            transform: scale(1.15);
-            z-index: 10;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        }
-
-        .heatmap-cell.rate-100 { background: rgba(16, 185, 129, 0.9); color: white; }
-        .heatmap-cell.rate-75 { background: rgba(16, 185, 129, 0.6); color: white; }
-        .heatmap-cell.rate-50 { background: rgba(251, 191, 36, 0.6); color: white; }
-        .heatmap-cell.rate-25 { background: rgba(239, 68, 68, 0.6); color: white; }
-        .heatmap-cell.rate-0 { background: rgba(239, 68, 68, 0.9); color: white; }
-        .heatmap-cell.no-data { background: rgba(148, 163, 184, 0.2); }
-
-        .heatmap-legend {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-            padding: 12px;
-            background: rgba(15, 23, 42, 0.4);
-            border-radius: 8px;
+        .event-time {
             font-size: 11px;
+            color: #94a3b8;
+            font-family: 'Consolas', monospace;
         }
 
-        .legend-item {
+        .event-details {
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .event-hosts {
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             gap: 6px;
         }
 
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
+        .event-host-badge {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            font-family: 'Consolas', monospace;
+        }
+
+        .event-duration {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #94a3b8;
+            font-style: italic;
         }
 
         /* ===== CUSTOM SCROLLBARS ===== */
-        .modal, .ping-history, .timeline-container, .heatmap-container {
+        .modal, .ping-history, .timeline-container, .events-list {
             scrollbar-width: thin;
             scrollbar-color: rgba(59, 130, 246, 0.5) rgba(15, 23, 42, 0.3);
         }
 
         .modal::-webkit-scrollbar, .ping-history::-webkit-scrollbar,
-        .timeline-container::-webkit-scrollbar, .heatmap-container::-webkit-scrollbar {
+        .timeline-container::-webkit-scrollbar, .events-list::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
 
         .modal::-webkit-scrollbar-track, .ping-history::-webkit-scrollbar-track,
-        .timeline-container::-webkit-scrollbar-track, .heatmap-container::-webkit-scrollbar-track {
+        .timeline-container::-webkit-scrollbar-track, .events-list::-webkit-scrollbar-track {
             background: rgba(15, 23, 42, 0.3);
             border-radius: 10px;
         }
 
         .modal::-webkit-scrollbar-thumb, .ping-history::-webkit-scrollbar-thumb,
-        .timeline-container::-webkit-scrollbar-thumb, .heatmap-container::-webkit-scrollbar-thumb {
+        .timeline-container::-webkit-scrollbar-thumb, .events-list::-webkit-scrollbar-thumb {
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.6) 0%, rgba(139, 92, 246, 0.6) 100%);
             border-radius: 10px;
             border: 2px solid rgba(15, 23, 42, 0.3);
         }
 
         .modal::-webkit-scrollbar-thumb:hover, .ping-history::-webkit-scrollbar-thumb:hover,
-        .timeline-container::-webkit-scrollbar-thumb:hover, .heatmap-container::-webkit-scrollbar-thumb:hover {
+        .timeline-container::-webkit-scrollbar-thumb:hover, .events-list::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(139, 92, 246, 0.8) 100%);
         }
 
@@ -1207,53 +1397,48 @@
             <div class="sidebar-subtitle">Select a tool to use</div>
         </div>
 
-        <div class="menu-section">
-            <div class="menu-section-title">Main Tools</div>
-            <a href="/" class="menu-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-                <span class="menu-item-text">Home</span>
-            </a>
-        </div>
+        <div class="menu-container">
+            <div class="menu-section">
+                <div class="menu-section-title">Network Tools</div>
+                <a href="/" class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2" opacity="0.5"></rect>
+                    </svg>
+                    <span class="menu-item-text">Network Discovery</span>
+                </a>
+                <a href="/ping" class="menu-item active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <circle cx="12" cy="12" r="9"></circle>
+                    </svg>
+                    <span class="menu-item-text">Ping Monitor</span>
+                </a>
+                <a href="/subnet" class="menu-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                        <line x1="2" y1="9" x2="22" y2="9"></line>
+                        <line x1="2" y1="13" x2="22" y2="13"></line>
+                    </svg>
+                    <span class="menu-item-text">Subnet Calculator</span>
+                </a>
+            </div>
 
-        <div class="menu-section">
-            <div class="menu-section-title">Discovery Tools</div>
-            <a href="/#discovery" class="menu-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
-                </svg>
-                <span class="menu-item-text">Switch Discovery</span>
-            </a>
-            <a href="/#vlan" class="menu-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                </svg>
-                <span class="menu-item-text">VLAN Detection</span>
-            </a>
-            <a href="/ping" class="menu-item active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="1"></circle>
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <circle cx="12" cy="12" r="9"></circle>
-                </svg>
-                <span class="menu-item-text">Ping Monitor</span>
-            </a>
-        </div>
-
-        <div class="menu-section">
-            <div class="menu-section-title">Coming Soon</div>
-            <a href="#" class="menu-item" style="opacity: 0.5; pointer-events: none;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                <span class="menu-item-text">More Tools Coming...</span>
-            </a>
+            <div class="menu-section">
+                <div class="menu-section-title">Coming Soon</div>
+                <a href="#" class="menu-item" style="opacity: 0.5; pointer-events: none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span class="menu-item-text">More Tools Coming...</span>
+                </a>
+            </div>
         </div>
     </nav>
 
@@ -1284,7 +1469,7 @@
                     <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
                 </svg>
                 <div class="brand-text">
-                    <h1 onclick="window.location.href='/'">ULTIMATE NETWORK TOOL</h1>
+                    <h1 onclick="window.location.href='/'">ULTIMATE NETWORK TOOL <span style="font-size: 0.4em; color: #64748b; font-weight: 400;">v3.3.0</span></h1>
                     <span class="tagline">Ping Monitor</span>
                 </div>
             </div>
@@ -1437,7 +1622,7 @@
                     <div class="view-switcher">
                         <button class="view-btn active" onclick="switchView('table')">📋 Table</button>
                         <button class="view-btn" onclick="switchView('timeline')">📊 Timeline</button>
-                        <button class="view-btn" onclick="switchView('heatmap')">🔥 Heatmap</button>
+                        <button class="view-btn" onclick="switchView('events')">⚠️ Events</button>
                     </div>
                 </div>
 
@@ -1447,6 +1632,51 @@
                         <button class="filter-btn active" onclick="filterResults('all')">Show All</button>
                         <button class="filter-btn" onclick="filterResults('reachable')">Reachable Only</button>
                         <button class="filter-btn" onclick="filterResults('unreachable')">Unreachable Only</button>
+                    </div>
+                    <!-- Column Selector -->
+                    <div style="position: relative; display: inline-block; margin-left: 15px;">
+                        <button class="filter-btn" onclick="toggleColumnMenu(event)" style="background: #1e293b; border: 1px solid #334155;">
+                            ⚙ Columns
+                        </button>
+                        <div id="columnMenu" class="column-menu" style="display: none;">
+                            <div class="column-menu-header">Show/Hide Columns</div>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('hostname', this.checked)">
+                                <span>Hostname</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('vendor', this.checked)">
+                                <span>Vendor</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('tag', this.checked)">
+                                <span>Tag</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('avg-ping', this.checked)">
+                                <span>Avg Ping (ms)</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('packets', this.checked)">
+                                <span>Packets (Sent/Rcv)</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('loss', this.checked)">
+                                <span>Loss %</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('success-fail', this.checked)">
+                                <span>Success/Fail</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('ttl', this.checked)">
+                                <span>TTL</span>
+                            </label>
+                            <label class="column-menu-item">
+                                <input type="checkbox" checked onchange="toggleColumn('last-update', this.checked)">
+                                <span>Last Update</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1458,18 +1688,21 @@
                         <tr>
                             <th style="width: 40px;">#</th>
                             <th onclick="sortTable('ip')">IP Address ▼</th>
-                            <th onclick="sortTable('hostname')">Hostname ▼</th>
+                            <th data-column="hostname" onclick="sortTable('hostname')">Hostname ▼</th>
+                            <th data-column="vendor" onclick="sortTable('vendor')">Vendor ▼</th>
+                            <th data-column="tag" style="width: 120px;">Tag</th>
                             <th onclick="sortTable('status')">Status ▼</th>
-                            <th onclick="sortTable('ping')">Avg Ping (ms) ▼</th>
-                            <th onclick="sortTable('packets')">Packets (Sent/Rcv) ▼</th>
-                            <th onclick="sortTable('loss')">Loss % ▼</th>
-                            <th onclick="sortTable('ttl')">TTL ▼</th>
-                            <th onclick="sortTable('lastUpdate')">Last Update ▼</th>
+                            <th data-column="avg-ping" onclick="sortTable('ping')">Avg Ping (ms) ▼</th>
+                            <th data-column="packets" onclick="sortTable('packets')">Packets (Sent/Rcv) ▼</th>
+                            <th data-column="loss" onclick="sortTable('loss')">Loss % ▼</th>
+                            <th data-column="success-fail" onclick="sortTable('success')">Success/Fail ▼</th>
+                            <th data-column="ttl" onclick="sortTable('ttl')">TTL ▼</th>
+                            <th data-column="last-update" onclick="sortTable('lastUpdate')">Last Update ▼</th>
                         </tr>
                     </thead>
                     <tbody id="resultsBody">
                         <tr>
-                            <td colspan="8">
+                            <td colspan="12">
                                 <div class="empty-state">
                                     Enter IP addresses or ranges above and click "Start Ping" to begin monitoring
                                 </div>
@@ -1503,52 +1736,48 @@
                 <div class="timeline-grid" id="timelineGrid"></div>
             </div>
 
-            <!-- HEATMAP VIEW -->
-            <div id="heatmapView" class="heatmap-container" style="display: none;">
-                <div class="time-range-selector">
-                    <label>TIME RANGE:</label>
-                    <select id="heatmapRange" onchange="handleTimeRangeChange('heatmap')">
-                        <option value="10">Last 10 minutes</option>
-                        <option value="30" selected>Last 30 minutes</option>
-                        <option value="60">Last 1 hour</option>
-                        <option value="240">Last 4 hours</option>
-                        <option value="720">Last 12 hours</option>
-                        <option value="1440">Last 24 hours</option>
-                        <option value="custom">Custom Range...</option>
-                    </select>
-                    <div class="custom-time-inputs" id="heatmapCustomInputs">
-                        <input type="datetime-local" id="heatmapStart">
-                        <span style="color: #94a3b8;">to</span>
-                        <input type="datetime-local" id="heatmapEnd">
-                        <button class="btn btn-secondary btn-apply-time" onclick="applyCustomTimeRange('heatmap')">Apply</button>
+            <!-- EVENTS VIEW (Network Event Viewer) -->
+            <div id="eventsView" class="events-container" style="display: none;">
+                <div class="events-summary">
+                    <div class="event-stat-card">
+                        <div class="event-stat-icon">🔴</div>
+                        <div class="event-stat-details">
+                            <div class="event-stat-label">Network Outages</div>
+                            <div class="event-stat-value" id="eventNetworkOutages">0</div>
+                        </div>
+                    </div>
+                    <div class="event-stat-card">
+                        <div class="event-stat-icon">🟠</div>
+                        <div class="event-stat-details">
+                            <div class="event-stat-label">Partial Outages</div>
+                            <div class="event-stat-value" id="eventPartialOutages">0</div>
+                        </div>
+                    </div>
+                    <div class="event-stat-card">
+                        <div class="event-stat-icon">🟡</div>
+                        <div class="event-stat-details">
+                            <div class="event-stat-label">Host Group Failures</div>
+                            <div class="event-stat-value" id="eventGroupFailures">0</div>
+                        </div>
+                    </div>
+                    <div class="event-stat-card">
+                        <div class="event-stat-icon">ℹ️</div>
+                        <div class="event-stat-details">
+                            <div class="event-stat-label">Total Events</div>
+                            <div class="event-stat-value" id="eventTotal">0</div>
+                        </div>
                     </div>
                 </div>
-                <div class="heatmap-grid" id="heatmapGrid"></div>
-                <div class="heatmap-legend">
-                    <div class="legend-item">
-                        <div class="legend-color rate-100"></div>
-                        <span>100% Success</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color rate-75"></div>
-                        <span>75-99%</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color rate-50"></div>
-                        <span>50-74%</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color rate-25"></div>
-                        <span>25-49%</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color rate-0"></div>
-                        <span>0-24%</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color no-data"></div>
-                        <span>No Data</span>
-                    </div>
+
+                <div class="events-filters">
+                    <button class="filter-btn active" onclick="filterEvents('all')">All Events</button>
+                    <button class="filter-btn" onclick="filterEvents('network')">🔴 Network Outages</button>
+                    <button class="filter-btn" onclick="filterEvents('partial')">🟠 Partial Outages</button>
+                    <button class="filter-btn" onclick="filterEvents('group')">🟡 Group Failures</button>
+                </div>
+
+                <div class="events-list" id="eventsList">
+                    <div class="empty-state">No events detected yet. Events will appear when 3+ hosts fail simultaneously for 3+ consecutive pings.</div>
                 </div>
             </div>
         </div>
@@ -1563,8 +1792,13 @@
                 <div class="modal-body">
                     <div class="modal-stats" id="modalStats"></div>
 
+                    <div style="margin-bottom: 16px;">
+                        <div class="section-title" style="margin-bottom: 12px; font-size: 15px;">Ping Response Graph</div>
+                        <canvas id="pingGraph" width="800" height="150" style="width: 100%; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(148, 163, 184, 0.1); border-radius: 8px;"></canvas>
+                    </div>
+
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <div class="section-title" style="margin-bottom: 0;">Ping History</div>
+                        <div class="section-title" style="margin-bottom: 0; font-size: 15px;">Ping History</div>
                         <div class="filter-buttons">
                             <button class="filter-btn active" onclick="filterHostPings('all')">All</button>
                             <button class="filter-btn" onclick="filterHostPings('success')">Success Only</button>
@@ -1591,6 +1825,7 @@
         let socket = null;
         let results = new Map();
         let pingHistory = new Map(); // Store all individual pings per host
+        let hostTags = new Map(); // Store tags for each host
         let currentFilter = 'all';
         let currentView = 'table';
         let sortColumn = 'ip';
@@ -1602,8 +1837,112 @@
         let renderTimeout = null; // For throttling renders
         let hostPingFilter = 'all';
 
+        // ===== HOST TAGGING FUNCTIONS =====
+
+        // Load tags from localStorage
+        function loadTags() {
+            try {
+                const saved = localStorage.getItem('hostTags');
+                if (saved) {
+                    const tagsObj = JSON.parse(saved);
+                    hostTags = new Map(Object.entries(tagsObj));
+                }
+            } catch (e) {
+                console.error('Error loading tags:', e);
+            }
+        }
+
+        // Save tags to localStorage
+        function saveTags() {
+            try {
+                const tagsObj = Object.fromEntries(hostTags);
+                localStorage.setItem('hostTags', JSON.stringify(tagsObj));
+            } catch (e) {
+                console.error('Error saving tags:', e);
+            }
+        }
+
+        // Set tag for a host
+        function setHostTag(ip, tag) {
+            if (tag && tag.trim()) {
+                hostTags.set(ip, tag.trim());
+            } else {
+                hostTags.delete(ip);
+            }
+            saveTags();
+            renderCurrentView();
+        }
+
+        // Get tag for a host
+        function getHostTag(ip) {
+            return hostTags.get(ip) || '';
+        }
+
+        // Get all unique tags
+        function getAllTags() {
+            const tags = new Set();
+            hostTags.forEach(tag => tags.add(tag));
+            return Array.from(tags).sort();
+        }
+
+        // Handle inline tag editing
+        document.addEventListener('click', function(e) {
+            const tagCell = e.target.closest('.tag-cell');
+            if (!tagCell) {
+                // Click outside - close any open tag inputs
+                document.querySelectorAll('.tag-input').forEach(input => {
+                    const ip = input.dataset.ip;
+                    const tag = getHostTag(ip);
+                    const parent = input.parentElement;
+                    parent.innerHTML = tag ?
+                        `<span class="host-tag-display">${tag}</span>` :
+                        '<span class="tag-placeholder">add tag</span>';
+                });
+                return;
+            }
+
+            // Check if already editing
+            if (tagCell.querySelector('.tag-input')) return;
+
+            const ip = tagCell.dataset.ip;
+            const currentTag = getHostTag(ip);
+
+            // Create input
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'tag-input';
+            input.value = currentTag || '';
+            input.placeholder = 'enter tag';
+            input.dataset.ip = ip;
+
+            // Replace content with input
+            tagCell.innerHTML = '';
+            tagCell.appendChild(input);
+            input.focus();
+            input.select();
+
+            // Handle save on Enter or blur
+            const saveTag = () => {
+                const newTag = input.value.trim();
+                setHostTag(ip, newTag);
+                renderTableView(); // Re-render to show updated tag
+            };
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    saveTag();
+                } else if (e.key === 'Escape') {
+                    renderTableView(); // Cancel
+                }
+            });
+
+            input.addEventListener('blur', saveTag);
+        });
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            loadTags();
+            loadColumnPreferences();
             connectWebSocket();
             checkStatus();
         });
@@ -1764,24 +2103,26 @@
                 ttl: data.ttl
             });
 
-            // Keep only last 1000 pings per host (increased from 100)
-            if (pingHistory.get(data.ip).length > 1000) {
-                pingHistory.get(data.ip).shift();
-            }
+            // Keep unlimited ping history (no limit)
+            // Removed limit - store all pings for complete history
 
-            // Update modal if showing this host
+            // Detect network events (simultaneous failures)
+            detectNetworkEvent();
+
+            // Update modal if showing this host (live update)
             if (selectedHost === data.ip) {
+                updateModalStats(data);
                 renderHostPingHistory();
             }
 
-            // Throttle rendering to max 2 times per second for performance
+            // Throttle rendering for performance while maintaining responsiveness
             if (renderTimeout) {
                 clearTimeout(renderTimeout);
             }
             renderTimeout = setTimeout(() => {
                 renderCurrentView();
                 updateStatistics();
-            }, 500); // Update UI every 500ms max
+            }, 100); // Update UI every 100ms max (10 times per second)
         }
 
         // Switch view
@@ -1795,15 +2136,15 @@
             // Hide all views
             document.getElementById('tableView').style.display = 'none';
             document.getElementById('timelineView').style.display = 'none';
-            document.getElementById('heatmapView').style.display = 'none';
+            document.getElementById('eventsView').style.display = 'none';
 
             // Show selected view
             if (view === 'table') {
                 document.getElementById('tableView').style.display = 'block';
             } else if (view === 'timeline') {
                 document.getElementById('timelineView').style.display = 'block';
-            } else if (view === 'heatmap') {
-                document.getElementById('heatmapView').style.display = 'block';
+            } else if (view === 'events') {
+                document.getElementById('eventsView').style.display = 'block';
             }
 
             renderCurrentView();
@@ -1815,8 +2156,8 @@
                 renderTableView();
             } else if (currentView === 'timeline') {
                 renderTimelineView();
-            } else if (currentView === 'heatmap') {
-                renderHeatmapView();
+            } else if (currentView === 'events') {
+                renderEventsView();
             }
         }
 
@@ -1825,7 +2166,7 @@
             const tbody = document.getElementById('resultsBody');
 
             if (results.size === 0) {
-                tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state">No results yet</div></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state">No results yet</div></td></tr>';
                 return;
             }
 
@@ -1841,12 +2182,27 @@
                 let aVal = a[sortColumn] || '';
                 let bVal = b[sortColumn] || '';
 
-                if (sortColumn === 'ping') {
+                if (sortColumn === 'ip') {
+                    // Sort IP addresses numerically
+                    const ipToNum = (ip) => {
+                        const parts = ip.split('.');
+                        return (parseInt(parts[0]) << 24) + (parseInt(parts[1]) << 16) +
+                               (parseInt(parts[2]) << 8) + parseInt(parts[3]);
+                    };
+                    aVal = ipToNum(a.ip);
+                    bVal = ipToNum(b.ip);
+                } else if (sortColumn === 'ping') {
                     aVal = a.avg_ping_ms || 9999;
                     bVal = b.avg_ping_ms || 9999;
                 } else if (sortColumn === 'loss') {
                     aVal = a.packet_loss_percent || 0;
                     bVal = b.packet_loss_percent || 0;
+                } else if (sortColumn === 'packets') {
+                    aVal = a.packets_sent || 0;
+                    bVal = b.packets_sent || 0;
+                } else if (sortColumn === 'ttl') {
+                    aVal = a.ttl || 0;
+                    bVal = b.ttl || 0;
                 }
 
                 if (sortAscending) {
@@ -1862,18 +2218,30 @@
 
                 const avgPing = r.avg_ping_ms !== null ? r.avg_ping_ms.toFixed(1) : 'N/A';
                 const lastUpdate = new Date(r.last_update).toLocaleTimeString();
+                const currentTag = getHostTag(r.ip);
+                const vendor = r.vendor || 'Unknown';
+                const vendorDisplay = vendor !== 'Unknown' ?
+                    `<span style="color: #94a3b8; font-size: 11px;">${vendor}</span>` :
+                    `<span style="color: #64748b; font-size: 10px;">-</span>`;
+                const successCount = r.total_success_count || 0;
+                const failureCount = r.total_failure_count || 0;
 
                 return `
                     <tr onclick="showHostDetail('${r.ip}')">
                         <td style="color: #64748b; font-weight: 600;">${index + 1}</td>
                         <td>${r.ip}</td>
-                        <td>${r.hostname || 'N/A'}</td>
+                        <td data-column="hostname">${r.hostname || 'N/A'}</td>
+                        <td data-column="vendor">${vendorDisplay}</td>
+                        <td data-column="tag" onclick="event.stopPropagation();" class="tag-cell" data-ip="${r.ip}">
+                            ${currentTag ? `<span class="host-tag-display">${currentTag}</span>` : '<span class="tag-placeholder">add tag</span>'}
+                        </td>
                         <td><span class="status-badge ${statusClass}">${r.status}</span></td>
-                        <td>${avgPing}</td>
-                        <td>${r.packets_sent}/${r.packets_received}</td>
-                        <td>${r.packet_loss_percent.toFixed(0)}%</td>
-                        <td>${r.ttl || 'N/A'}</td>
-                        <td>${lastUpdate}</td>
+                        <td data-column="avg-ping">${avgPing}</td>
+                        <td data-column="packets">${r.packets_sent}/${r.packets_received}</td>
+                        <td data-column="loss">${r.packet_loss_percent.toFixed(0)}%</td>
+                        <td data-column="success-fail"><span style="color: #10b981; font-weight: 600;">${successCount}</span> / <span style="color: #ef4444; font-weight: 600;">${failureCount}</span></td>
+                        <td data-column="ttl">${r.ttl || 'N/A'}</td>
+                        <td data-column="last-update">${lastUpdate}</td>
                     </tr>
                 `;
             }).join('');
@@ -1981,119 +2349,198 @@
             // This is a simplified implementation - can be enhanced
         }
 
-        // Render heatmap view
-        function renderHeatmapView() {
-            const grid = document.getElementById('heatmapGrid');
+        // ===== NETWORK EVENT VIEWER FUNCTIONS =====
 
-            if (results.size === 0) {
-                grid.innerHTML = '<div class="empty-state">No results yet</div>';
+        // Global state for events
+        let networkEvents = [];
+        let currentEventFilter = 'all';
+        let hostFailureTracking = new Map(); // Track consecutive failures per host
+
+        // Render Events View
+        function renderEventsView() {
+            const eventsList = document.getElementById('eventsList');
+
+            if (networkEvents.length === 0) {
+                eventsList.innerHTML = '<div class="empty-state">No events detected yet. Events will appear when 3+ hosts fail simultaneously for 5+ consecutive pings.</div>';
+                updateEventStats();
                 return;
             }
 
-            let resultArray = Array.from(results.values());
-            if (currentFilter === 'reachable') {
-                resultArray = resultArray.filter(r => r.status === 'Reachable');
-            } else if (currentFilter === 'unreachable') {
-                resultArray = resultArray.filter(r => r.status === 'Unreachable');
+            let filteredEvents = networkEvents;
+            if (currentEventFilter === 'network') {
+                filteredEvents = networkEvents.filter(e => e.type === 'network-outage');
+            } else if (currentEventFilter === 'partial') {
+                filteredEvents = networkEvents.filter(e => e.type === 'partial-outage');
+            } else if (currentEventFilter === 'group') {
+                filteredEvents = networkEvents.filter(e => e.type === 'group-failure');
             }
 
-            // Determine time range
-            const now = new Date();
-            let startTime, endTime;
-            if (heatmapCustomStart && heatmapCustomEnd) {
-                startTime = heatmapCustomStart;
-                endTime = heatmapCustomEnd;
-            } else {
-                startTime = new Date(now.getTime() - heatmapRange * 60 * 1000);
-                endTime = now;
-            }
+            // Store current scroll position
+            const currentScrollPos = eventsList.scrollTop;
 
-            grid.innerHTML = '';
+            eventsList.innerHTML = filteredEvents.map(event => {
+                const typeText = event.type === 'network-outage' ? '🔴 Network Outage' :
+                                event.type === 'partial-outage' ? '🟠 Partial Outage' : '🟡 Host Group Failure';
 
-            resultArray.forEach(host => {
-                const allHistory = pingHistory.get(host.ip) || [];
-                // Filter by time range
-                const filteredHistory = filterPingsByTimeRange(allHistory, 'heatmap');
+                const affectedCount = event.affectedHosts.length;
 
-                // Group pings into time-based buckets
-                const buckets = groupPingsIntoBuckets(filteredHistory, startTime, endTime);
+                return `
+                    <div class="event-item ${event.type}">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 12px; font-weight: 600;">${typeText}</span>
+                            <span style="font-size: 11px; color: #94a3b8;">${event.timestamp.toLocaleTimeString()}</span>
+                        </div>
+                        <div style="font-size: 11px; color: #cbd5e1; margin-bottom: 6px;">
+                            <strong>${affectedCount}</strong> host${affectedCount > 1 ? 's' : ''} affected (${event.percentageAffected}%)
+                        </div>
+                        <div style="font-size: 10px; color: #94a3b8; max-height: 60px; overflow-y: auto;">
+                            ${event.affectedHosts.join(', ')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
-                const row = document.createElement('div');
-                row.className = 'heatmap-row';
+            // Restore scroll position to prevent jumping
+            eventsList.scrollTop = currentScrollPos;
 
-                // Host label
-                const label = document.createElement('div');
-                label.className = 'heatmap-host-label';
-                label.textContent = host.ip;
-                row.appendChild(label);
+            updateEventStats();
+        }
 
-                // Heatmap cells
-                buckets.forEach((bucket, idx) => {
-                    const cell = document.createElement('div');
-                    cell.className = 'heatmap-cell';
+        // Update event statistics
+        function updateEventStats() {
+            const networkOutages = networkEvents.filter(e => e.type === 'network-outage').length;
+            const partialOutages = networkEvents.filter(e => e.type === 'partial-outage').length;
+            const groupFailures = networkEvents.filter(e => e.type === 'group-failure').length;
 
-                    if (bucket.count === 0) {
-                        cell.classList.add('no-data');
+            document.getElementById('eventNetworkOutages').textContent = networkOutages;
+            document.getElementById('eventPartialOutages').textContent = partialOutages;
+            document.getElementById('eventGroupFailures').textContent = groupFailures;
+            document.getElementById('eventTotal').textContent = networkEvents.length;
+        }
+
+        // Detect network events (called from updateResult)
+        function detectNetworkEvent() {
+            // Need at least 5 hosts actively being monitored to detect group failures
+            if (results.size < 5) return;
+
+            // Update failure tracking for each host
+            results.forEach((result, ip) => {
+                if (!hostFailureTracking.has(ip)) {
+                    hostFailureTracking.set(ip, {
+                        consecutiveFailures: 0,
+                        lastStatus: null,
+                        wasEverReachable: false,
+                        firstFailureTime: null
+                    });
+                }
+
+                const tracking = hostFailureTracking.get(ip);
+
+                // Mark as reachable if host responds
+                if (result.status === 'Reachable') {
+                    tracking.wasEverReachable = true;
+                    tracking.firstFailureTime = null; // Reset failure timer
+                }
+
+                // Only track failures for hosts that were ever reachable
+                if (tracking.wasEverReachable) {
+                    if (result.status === 'Unreachable') {
+                        if (tracking.lastStatus === 'Unreachable') {
+                            tracking.consecutiveFailures++;
+                        } else {
+                            tracking.consecutiveFailures = 1;
+                            tracking.firstFailureTime = Date.now(); // Record when failures started
+                        }
                     } else {
-                        const successRate = (bucket.success / bucket.count) * 100;
-                        if (successRate === 100) cell.classList.add('rate-100');
-                        else if (successRate >= 75) cell.classList.add('rate-75');
-                        else if (successRate >= 50) cell.classList.add('rate-50');
-                        else if (successRate >= 25) cell.classList.add('rate-25');
-                        else cell.classList.add('rate-0');
-
-                        cell.textContent = `${Math.round(successRate)}%`;
+                        tracking.consecutiveFailures = 0;
+                        tracking.firstFailureTime = null;
                     }
+                }
 
-                    // Show time range in tooltip
-                    const timeLabel = `${formatTimeLabel(bucket.startTime)} - ${formatTimeLabel(bucket.endTime)}`;
-                    cell.title = `${timeLabel}: ${bucket.success}/${bucket.count} success (${Math.round(bucket.success / bucket.count * 100)}%)`;
-                    cell.onclick = () => showHostDetail(host.ip);
-                    row.appendChild(cell);
-                });
-
-                grid.appendChild(row);
+                tracking.lastStatus = result.status;
             });
-        }
 
-        // Group pings into time buckets
-        function groupPingsIntoBuckets(pings, startTime, endTime) {
-            const totalBuckets = 10;
-            const buckets = [];
-            const timeSpanMs = endTime - startTime;
-            const bucketDurationMs = timeSpanMs / totalBuckets;
+            // Count hosts that were ever reachable (actively monitored)
+            const totalMonitoredHosts = Array.from(hostFailureTracking.values())
+                .filter(tracking => tracking.wasEverReachable).length;
 
-            for (let i = 0; i < totalBuckets; i++) {
-                const bucketStart = new Date(startTime.getTime() + i * bucketDurationMs);
-                const bucketEnd = new Date(startTime.getTime() + (i + 1) * bucketDurationMs);
+            // Require at least 5 actively monitored hosts
+            if (totalMonitoredHosts < 5) return;
 
-                // Find pings in this time bucket
-                const bucketPings = pings.filter(ping => {
-                    const pingTime = new Date(ping.timestamp);
-                    return pingTime >= bucketStart && pingTime < bucketEnd;
-                });
+            // Find hosts with 5+ consecutive failures AND failures persisting for 15+ seconds
+            const now = Date.now();
+            const hostsWithPersistentFailures = Array.from(hostFailureTracking.entries())
+                .filter(([ip, tracking]) => {
+                    return tracking.wasEverReachable &&
+                           tracking.consecutiveFailures >= 5 &&
+                           tracking.firstFailureTime &&
+                           (now - tracking.firstFailureTime) >= 15000; // 15 seconds minimum
+                })
+                .map(([ip, tracking]) => ip);
 
-                buckets.push({
-                    startTime: bucketStart,
-                    endTime: bucketEnd,
-                    count: bucketPings.length,
-                    success: bucketPings.filter(p => p.status === 'Reachable').length
-                });
+            // Detect simultaneous failures (3+ hosts with persistent failures)
+            if (hostsWithPersistentFailures.length >= 3) {
+                const affectedCount = hostsWithPersistentFailures.length;
+                const percentageAffected = (affectedCount / totalMonitoredHosts) * 100;
+
+                // Check if this event already exists (avoid duplicates)
+                const recentEvent = networkEvents[networkEvents.length - 1];
+                const sameHosts = recentEvent &&
+                    JSON.stringify(recentEvent.affectedHosts.sort()) ===
+                    JSON.stringify(hostsWithPersistentFailures.sort());
+
+                if (sameHosts) return; // Skip duplicate event
+
+                // Classify event type
+                let eventType;
+                if (percentageAffected >= 50) {
+                    eventType = 'network-outage'; // 50%+ hosts failing = network outage
+                } else if (percentageAffected >= 25) {
+                    eventType = 'partial-outage'; // 25-49% hosts = partial outage
+                } else {
+                    eventType = 'group-failure'; // 3-24% hosts = group failure
+                }
+
+                // Create event
+                const event = {
+                    type: eventType,
+                    timestamp: new Date(),
+                    affectedHosts: [...hostsWithPersistentFailures],
+                    totalHosts: totalMonitoredHosts,
+                    percentageAffected: percentageAffected.toFixed(1)
+                };
+
+                networkEvents.push(event);
+
+                // Update events view if currently visible (without scrolling)
+                if (currentView === 'events') {
+                    renderEventsView();
+                }
             }
-
-            return buckets;
         }
 
-        // Show host detail
-        function showHostDetail(ip) {
-            selectedHost = ip;
-            const host = results.get(ip);
+        // Filter events
+        function filterEvents(filter) {
+            currentEventFilter = filter;
+
+            // Update filter button states
+            const buttons = document.querySelectorAll('.events-filters .filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            renderEventsView();
+        }
+
+        // Update modal stats (for live updates)
+        function updateModalStats(host) {
             if (!host) return;
 
-            document.getElementById('modalHostTitle').textContent = `${host.hostname || ip} - Detailed View`;
-
-            // Update stats
             const statsDiv = document.getElementById('modalStats');
+            if (!statsDiv) return;
+
+            const successCount = host.total_success_count || 0;
+            const failureCount = host.total_failure_count || 0;
+
             statsDiv.innerHTML = `
                 <div class="modal-stat">
                     <div class="modal-stat-label">IP Address</div>
@@ -2120,14 +2567,34 @@
                     <div class="modal-stat-value">${host.packet_loss_percent.toFixed(0)}%</div>
                 </div>
                 <div class="modal-stat">
+                    <div class="modal-stat-label">Success Pings</div>
+                    <div class="modal-stat-value" style="color: #10b981;">${successCount}</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-label">Failed Pings</div>
+                    <div class="modal-stat-value" style="color: #ef4444;">${failureCount}</div>
+                </div>
+                <div class="modal-stat">
                     <div class="modal-stat-label">TTL</div>
                     <div class="modal-stat-value">${host.ttl || 'N/A'}</div>
                 </div>
                 <div class="modal-stat">
                     <div class="modal-stat-label">Total Pings</div>
-                    <div class="modal-stat-value">${pingHistory.get(ip)?.length || 0}</div>
+                    <div class="modal-stat-value">${pingHistory.get(host.ip)?.length || 0}</div>
                 </div>
             `;
+        }
+
+        // Show host detail
+        function showHostDetail(ip) {
+            selectedHost = ip;
+            const host = results.get(ip);
+            if (!host) return;
+
+            document.getElementById('modalHostTitle').textContent = `${host.hostname || ip} - Detailed View`;
+
+            // Update stats using the shared function
+            updateModalStats(host);
 
             // Reset filter
             hostPingFilter = 'all';
@@ -2135,8 +2602,92 @@
             document.querySelectorAll('.modal-body .filter-btn')[0].classList.add('active');
 
             renderHostPingHistory();
+            drawPingGraph(ip);
 
             document.getElementById('hostModal').classList.add('show');
+        }
+
+        // Draw ping response time graph
+        function drawPingGraph(ip) {
+            const canvas = document.getElementById('pingGraph');
+            const ctx = canvas.getContext('2d');
+            const history = pingHistory.get(ip) || [];
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (history.length === 0) {
+                ctx.fillStyle = '#64748b';
+                ctx.font = '14px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText('No ping data available yet', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            // Get last 50 pings
+            const data = history.slice(-50);
+            const padding = 40;
+            const graphWidth = canvas.width - padding * 2;
+            const graphHeight = canvas.height - padding * 2;
+
+            // Find max ping time for scaling (ignore failures)
+            const pings = data.filter(p => p.status === 'Reachable').map(p => p.rtt);
+            const maxPing = Math.max(...pings, 10); // Min 10ms scale
+            const minPing = Math.min(...pings, 0);
+
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.1)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (graphHeight / 4) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(canvas.width - padding, y);
+                ctx.stroke();
+
+                // Y-axis labels
+                const value = maxPing - (maxPing / 4) * i;
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '10px Segoe UI';
+                ctx.textAlign = 'right';
+                ctx.fillText(value.toFixed(0) + 'ms', padding - 8, y + 4);
+            }
+
+            // Draw ping line
+            ctx.strokeStyle = '#60a5fa';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            data.forEach((ping, i) => {
+                const x = padding + (graphWidth / (data.length - 1 || 1)) * i;
+
+                if (ping.status === 'Reachable') {
+                    const y = padding + graphHeight - ((ping.rtt - minPing) / (maxPing - minPing || 1)) * graphHeight;
+
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+
+                    // Draw point
+                    ctx.fillStyle = '#60a5fa';
+                    ctx.fillRect(x - 2, y - 2, 4, 4);
+                } else {
+                    // Draw red dot for failed pings
+                    const y = padding + graphHeight;
+                    ctx.fillStyle = '#ef4444';
+                    ctx.fillRect(x - 2, y - 2, 4, 4);
+                }
+            });
+
+            ctx.stroke();
+
+            // Draw axis labels
+            ctx.fillStyle = '#cbd5e1';
+            ctx.font = '11px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('Last ' + data.length + ' Pings', canvas.width / 2, canvas.height - 5);
         }
 
         // Filter host pings
@@ -2226,6 +2777,63 @@
             renderCurrentView();
         }
 
+        // Column selector menu functions
+        function toggleColumnMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('columnMenu');
+            const isVisible = menu.style.display === 'block';
+            menu.style.display = isVisible ? 'none' : 'block';
+        }
+
+        function toggleColumn(columnName, show) {
+            // Toggle header
+            const headers = document.querySelectorAll(`th[data-column="${columnName}"]`);
+            headers.forEach(th => {
+                if (show) {
+                    th.classList.remove('hidden');
+                } else {
+                    th.classList.add('hidden');
+                }
+            });
+
+            // Toggle cells
+            const cells = document.querySelectorAll(`td[data-column="${columnName}"]`);
+            cells.forEach(td => {
+                if (show) {
+                    td.classList.remove('hidden');
+                } else {
+                    td.classList.add('hidden');
+                }
+            });
+
+            // Save preferences to localStorage
+            const columnPrefs = JSON.parse(localStorage.getItem('pingColumnPrefs') || '{}');
+            columnPrefs[columnName] = show;
+            localStorage.setItem('pingColumnPrefs', JSON.stringify(columnPrefs));
+        }
+
+        // Close column menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('columnMenu');
+            if (menu && !event.target.closest('#columnMenu') && !event.target.closest('[onclick*="toggleColumnMenu"]')) {
+                menu.style.display = 'none';
+            }
+        });
+
+        // Load column preferences on page load
+        function loadColumnPreferences() {
+            const columnPrefs = JSON.parse(localStorage.getItem('pingColumnPrefs') || '{}');
+            Object.keys(columnPrefs).forEach(columnName => {
+                const show = columnPrefs[columnName];
+                toggleColumn(columnName, show);
+                // Update checkbox state
+                const checkbox = document.querySelector(`input[onchange*="toggleColumn('${columnName}'"]`);
+                if (checkbox) {
+                    checkbox.checked = show;
+                }
+            });
+        }
+
         // Sort table
         function sortTable(column) {
             if (sortColumn === column) {
@@ -2257,7 +2865,7 @@
                 return;
             }
 
-            const headers = ['IP Address', 'Hostname', 'Status', 'Avg Ping (ms)', 'Min Ping (ms)', 'Max Ping (ms)', 'Packets Sent', 'Packets Received', 'Loss %', 'TTL', 'Last Update'];
+            const headers = ['IP Address', 'Hostname', 'Status', 'Avg Ping (ms)', 'Min Ping (ms)', 'Max Ping (ms)', 'Packets Sent', 'Packets Received', 'Loss %', 'Success Count', 'Failure Count', 'Vendor', 'TTL', 'Last Update'];
             const rows = Array.from(results.values()).map(r => [
                 r.ip,
                 r.hostname || 'N/A',
@@ -2268,6 +2876,9 @@
                 r.packets_sent,
                 r.packets_received,
                 r.packet_loss_percent.toFixed(0),
+                r.total_success_count || 0,
+                r.total_failure_count || 0,
+                r.vendor || 'Unknown',
                 r.ttl || 'N/A',
                 new Date(r.last_update).toLocaleString()
             ]);
@@ -2299,11 +2910,8 @@
 
         // Global state for time ranges
         let timelineRange = 30; // minutes
-        let heatmapRange = 30; // minutes
         let timelineCustomStart = null;
         let timelineCustomEnd = null;
-        let heatmapCustomStart = null;
-        let heatmapCustomEnd = null;
 
         // Handle time range dropdown change
         function handleTimeRangeChange(view) {
@@ -2320,15 +2928,9 @@
             } else {
                 customInputs.classList.remove('show');
                 const rangeMinutes = parseInt(select.value);
-                if (view === 'timeline') {
-                    timelineRange = rangeMinutes;
-                    timelineCustomStart = null;
-                    timelineCustomEnd = null;
-                } else {
-                    heatmapRange = rangeMinutes;
-                    heatmapCustomStart = null;
-                    heatmapCustomEnd = null;
-                }
+                timelineRange = rangeMinutes;
+                timelineCustomStart = null;
+                timelineCustomEnd = null;
                 renderCurrentView();
             }
         }
@@ -2351,13 +2953,8 @@
                 return;
             }
 
-            if (view === 'timeline') {
-                timelineCustomStart = start;
-                timelineCustomEnd = end;
-            } else {
-                heatmapCustomStart = start;
-                heatmapCustomEnd = end;
-            }
+            timelineCustomStart = start;
+            timelineCustomEnd = end;
 
             renderCurrentView();
             showNotification('Custom time range applied', 'success');
@@ -2373,27 +2970,17 @@
             return `${year}-${month}-${day}T${hours}:${minutes}`;
         }
 
-        // Filter pings by time range
+        // Filter pings by time range (timeline only)
         function filterPingsByTimeRange(pings, view) {
             const now = new Date();
             let start, end;
 
-            if (view === 'timeline') {
-                if (timelineCustomStart && timelineCustomEnd) {
-                    start = timelineCustomStart;
-                    end = timelineCustomEnd;
-                } else {
-                    start = new Date(now.getTime() - timelineRange * 60 * 1000);
-                    end = now;
-                }
+            if (timelineCustomStart && timelineCustomEnd) {
+                start = timelineCustomStart;
+                end = timelineCustomEnd;
             } else {
-                if (heatmapCustomStart && heatmapCustomEnd) {
-                    start = heatmapCustomStart;
-                    end = heatmapCustomEnd;
-                } else {
-                    start = new Date(now.getTime() - heatmapRange * 60 * 1000);
-                    end = now;
-                }
+                start = new Date(now.getTime() - timelineRange * 60 * 1000);
+                end = now;
             }
 
             return pings.filter(ping => {
